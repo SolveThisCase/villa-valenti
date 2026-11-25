@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Telefono — Tastierino</title>
+  <style>
+    /* =========================================================================
+       1. DESIGN TOKENS — iOS PHONE APP DARK MODE (#000000 PURO)
+       ========================================================================= */
+    :root {
+      --ios-bg: #000000;
+      --ios-key-bg: #333333;
+      --ios-key-active: #737373;
+      --ios-green: #34c759;
+      --ios-green-active: #28a745;
+      --ios-red: #ff3b30;
+      --ios-red-active: #d62c22;
+      --ios-blue: #0a84ff;
+      --ios-text-primary: #ffffff;
+      --ios-text-secondary: #8e8e93;
+      --ios-tab-bg: rgba(22, 22, 24, 0.88);
+      --ios-separator: rgba(255, 255, 255, 0.12);
+      --ios-card-dark: rgba(28, 28, 30, 0.92);
+      --key-size: clamp(64px, 9.2dvh, 78px);
+      --key-gap-x: clamp(16px, 5.5vw, 26px);
+      --key-gap-y: clamp(10px, 1.65dvh, 16px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000000;
+      color: var(--ios-text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Cornice mobile iPhone centrata su desktop */
+    .ios-device {
+      width: 100%;
+      max-width: 430px;
+      height: 100dvh;
+      background-color: var(--ios-bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 480px) {
+      .ios-device {
+        height: 94dvh;
+        max-height: 890px;
+        border-radius: 44px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9);
+      }
+    }
+
+    /* =========================================================================
+       2. STATUS BAR iOS DISCRETA
+       ========================================================================= */
+    .ios-statusbar {
+      height: 34px;
+      padding: 8px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .ios-status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* =========================================================================
+       3. VISTE PRINCIPALI (TASTIERINO, RECENTI, CONTATTI, PREFERITI)
+       ========================================================================= */
+    .ios-view {
+      flex: 1;
+      min-height: 0;
+      display: none;
+      flex-direction: column;
+    }
+
+    .ios-view.active {
+      display: flex;
+    }
+
+    /* --- VISTA TASTIERINO --- */
+    .keypad-screen {
+      justify-content: space-between;
+      padding: 6px 20px 14px;
+    }
+
+    .number-display-area {
+      min-height: clamp(74px, 11dvh, 96px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px 0;
+    }
+
+    .dialed-number {
+      font-size: clamp(28px, 4.4dvh, 38px);
+      font-weight: 400;
+      letter-spacing: 0.8px;
+      color: var(--ios-text-primary);
+      text-align: center;
+      min-height: 44px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 100%;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .add-number-btn {
+      margin-top: 4px;
+      background: transparent;
+      border: none;
+      color: var(--ios-blue);
+      font-size: 14.5px;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .add-number-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .add-number-btn:active {
+      opacity: 0.6;
+    }
+
+    /* Griglia circolare 3x4 + riga inferiore chiamata/cancella */
+    .keypad-matrix {
+      display: grid;
+      grid-template-columns: repeat(3, var(--key-size));
+      column-gap: var(--key-gap-x);
+      row-gap: var(--key-gap-y);
+      justify-content: center;
+      align-items: center;
+      margin: auto 0;
+    }
+
+    .ios-key {
+      width: var(--key-size);
+      height: var(--key-size);
+      border-radius: 50%;
+      border: none;
+      background-color: var(--ios-key-bg);
+      color: var(--ios-text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.08s ease;
+      position: relative;
+    }
+
+    .ios-key:active,
+    .ios-key.pressed {
+      background-color: var(--ios-key-active);
+    }
+
+    .key-digit {
+      font-size: clamp(28px, 4dvh, 34px);
+      font-weight: 400;
+      line-height: 1;
+      margin-top: -2px;
+    }
+
+    .key-digit.symbol-star {
+      font-size: clamp(32px, 4.5dvh, 38px);
+      margin-top: 6px;
+    }
+
+    .key-digit.symbol-hash {
+      font-size: clamp(26px, 3.8dvh, 31px);
+      margin-top: 0;
+    }
+
+    .key-letters {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      color: var(--ios-text-primary);
+      margin-top: 2px;
+      min-height: 11px;
+    }
+
+    .key-letters.plus-sign {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0;
+      margin-top: 0;
+    }
+
+    /* Spazio vuoto a sinistra del tasto verde */
+    .keypad-spacer {
+      width: var(--key-size);
+      height: var(--key-size);
+    }
+
+    /* Tasto verde chiamata iOS */
+    .ios-call-btn {
+      width: var(--key-size);
+      height: var(--key-size);
+      border-radius: 50%;
+      border: none;
+      background-color: var(--ios-green);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.1s ease, transform 0.08s ease;
+    }
+
+    .ios-call-btn:active {
+      background-color: var(--ios-green-active);
+      transform: scale(0.95);
+    }
+
+    /* Tasto backspace iOS a destra del tasto verde */
+    .ios-backspace-btn {
+      width: var(--key-size);
+      height: var(--key-size);
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: #a1a1a6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease, color 0.1s ease;
+    }
+
+    .ios-backspace-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .ios-backspace-btn:active {
+      color: #ffffff;
+    }
+
+    /* --- ALTRE SCHEDE iOS (PREFERITI, RECENTI, CONTATTI) --- */
+    .subview-header {
+      padding: 10px 20px 12px;
+      border-bottom: 0.5px solid var(--ios-separator);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .subview-title {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .subview-action {
+      background: transparent;
+      border: none;
+      color: var(--ios-blue);
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .subview-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px;
+    }
+
+    .empty-state-center {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--ios-text-secondary);
+      padding: 24px;
+      gap: 8px;
+    }
+
+    .empty-state-center strong {
+      font-size: 18px;
+      font-weight: 600;
+      color: #aeaeb2;
+    }
+
+    .empty-state-center p {
+      font-size: 14px;
+      line-height: 1.4;
+      max-width: 260px;
+    }
+
+    .recent-row {
+      padding: 13px 0;
+      border-bottom: 0.5px solid var(--ios-separator);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .recent-row:active {
+      opacity: 0.65;
+    }
+
+    .recent-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .recent-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-title.unknown {
+      color: var(--ios-red);
+    }
+
+    .recent-sub {
+      font-size: 13px;
+      color: var(--ios-text-secondary);
+      margin-top: 2px;
+    }
+
+    .recent-time {
+      font-size: 13.5px;
+      color: var(--ios-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* =========================================================================
+       4. TAB BAR INFERIORE TRASLUCIDA iOS
+       ========================================================================= */
+    .ios-tabbar {
+      height: 64px;
+      background-color: var(--ios-tab-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 0.5px solid var(--ios-separator);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 4px 10px;
+      flex-shrink: 0;
+      z-index: 15;
+    }
+
+    .ios-tab {
+      background: transparent;
+      border: none;
+      color: var(--ios-text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .ios-tab.active {
+      color: var(--ios-blue);
+    }
+
+    /* =========================================================================
+       5. SCHERMATA CHIAMATA IN CORSO iOS DARK MODE
+       ========================================================================= */
+    .ios-call-screen {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 15%, #1c1c1e 0%, #000000 72%);
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 44px 22px 34px;
+    }
+
+    .ios-call-screen.open {
+      display: flex;
+      animation: callSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes callSlideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .incall-header {
+      text-align: center;
+    }
+
+    .incall-status {
+      font-size: 15px;
+      color: var(--ios-text-secondary);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 6px;
+    }
+
+    .incall-status.live {
+      color: #d1d1d6;
+    }
+
+    .incall-primary {
+      font-size: 27px;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .incall-secondary {
+      font-size: 14.5px;
+      color: var(--ios-text-secondary);
+      margin-top: 5px;
+    }
+
+    /* Riquadro Trascrizione Vivavoce */
+    .transcript-panel {
+      background-color: var(--ios-card-dark);
+      border: 0.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      padding: 13px 15px;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 210px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+    }
+
+    .transcript-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--ios-text-secondary);
+    }
+
+    .equalizer {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2.5px;
+      height: 12px;
+      opacity: 0.35;
+    }
+
+    .equalizer.speaking {
+      opacity: 1;
+    }
+
+    .equalizer span {
+      width: 2.5px;
+      height: 4px;
+      background-color: var(--ios-green);
+      border-radius: 2px;
+    }
+
+    .equalizer.speaking span:nth-child(1) { animation: eqBar 0.55s infinite ease-in-out; }
+    .equalizer.speaking span:nth-child(2) { animation: eqBar 0.42s infinite ease-in-out 0.12s; }
+    .equalizer.speaking span:nth-child(3) { animation: eqBar 0.65s infinite ease-in-out 0.24s; }
+    .equalizer.speaking span:nth-child(4) { animation: eqBar 0.48s infinite ease-in-out 0.08s; }
+
+    @keyframes eqBar {
+      0%, 100% { height: 3px; }
+      50% { height: 12px; }
+    }
+
+    .transcript-scroll {
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.48;
+      color: #f2f2f7;
+      white-space: pre-wrap;
+    }
+
+    .replay-pill {
+      align-self: flex-start;
+      background: rgba(10, 132, 255, 0.18);
+      border: 1px solid rgba(10, 132, 255, 0.45);
+      color: #64b5ff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .replay-pill.hidden {
+      display: none;
+    }
+
+    /* Griglia 3x2 controlli chiamata iOS */
+    .incall-controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 14px;
+      justify-items: center;
+      margin: 4px 0 12px;
+    }
+
+    .incall-ctrl-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .incall-ctrl-btn {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .incall-ctrl-btn.active-white {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .incall-ctrl-btn.disabled-look {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .incall-ctrl-label {
+      font-size: 12px;
+      color: #d1d1d6;
+    }
+
+    /* Bottone rosso chiusura chiamata iOS */
+    .incall-hangup-row {
+      display: flex;
+      justify-content: center;
+    }
+
+    .ios-hangup-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--ios-red);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.1s ease, transform 0.08s ease;
+    }
+
+    .ios-hangup-btn:active {
+      background-color: var(--ios-red-active);
+      transform: scale(0.95);
+    }
+
+    /* Toast notifica iOS discreta */
+    .ios-toast {
+      position: absolute;
+      top: 44px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-14px);
+      background: rgba(44, 44, 46, 0.96);
+      border: 0.5px solid rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      font-size: 13px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 70;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .ios-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <main class="ios-device">
+
+    <!-- ==================== STATUS BAR iOS ==================== -->
+    <div class="ios-statusbar" aria-hidden="true">
+      <span id="ios-clock">21:41</span>
+      <div class="ios-status-icons">
+        <!-- Tacche segnale -->
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor">
+          <rect x="0" y="7" width="2.8" height="4" rx="0.8"/>
+          <rect x="4.2" y="5" width="2.8" height="6" rx="0.8"/>
+          <rect x="8.4" y="2.5" width="2.8" height="8.5" rx="0.8"/>
+          <rect x="12.6" y="0" width="2.8" height="11" rx="0.8"/>
+        </svg>
+        <!-- Wi-Fi -->
+        <svg width="15" height="11" viewBox="0 0 16 12" fill="currentColor">
+          <path d="M8 9.6a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8zm-3.6-2.1a5.2 5.2 0 017.2 0l1.1-1.2a6.8 6.8 0 00-9.4 0l1.1 1.2zm-2.6-2.7a8.9 8.9 0 0112.4 0l1.1-1.2a10.5 10.5 0 00-14.6 0l1.1 1.2z"/>
+        </svg>
+        <!-- Batteria -->
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none">
+          <rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="rgba(255,255,255,0.45)"/>
+          <rect x="2" y="2" width="17" height="8" rx="1.8" fill="#ffffff"/>
+          <path d="M23 4v4a1.5 1.5 0 000-4z" fill="rgba(255,255,255,0.45)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Toast iOS -->
+    <div id="ios-toast" class="ios-toast"></div>
+
+    <!-- ==================== VISTA 1: TASTIERINO ==================== -->
+    <section id="view-keypad" class="ios-view keypad-screen active">
+      <div class="number-display-area">
+        <div id="dialed-display" class="dialed-number" aria-live="polite"></div>
+        <button id="add-number-btn" type="button" class="add-number-btn" onclick="handleAddNumberClick()">
+          Aggiungi numero
+        </button>
+      </div>
+
+      <div class="keypad-matrix" role="group" aria-label="Tastierino numerico">
+        <button type="button" class="ios-key" data-digit="1" onclick="pressDigit('1')">
+          <span class="key-digit">1</span>
+          <span class="key-letters">&nbsp;</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="2" onclick="pressDigit('2')">
+          <span class="key-digit">2</span>
+          <span class="key-letters">ABC</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="3" onclick="pressDigit('3')">
+          <span class="key-digit">3</span>
+          <span class="key-letters">DEF</span>
+        </button>
+
+        <button type="button" class="ios-key" data-digit="4" onclick="pressDigit('4')">
+          <span class="key-digit">4</span>
+          <span class="key-letters">GHI</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="5" onclick="pressDigit('5')">
+          <span class="key-digit">5</span>
+          <span class="key-letters">JKL</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="6" onclick="pressDigit('6')">
+          <span class="key-digit">6</span>
+          <span class="key-letters">MNO</span>
+        </button>
+
+        <button type="button" class="ios-key" data-digit="7" onclick="pressDigit('7')">
+          <span class="key-digit">7</span>
+          <span class="key-letters">PQRS</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="8" onclick="pressDigit('8')">
+          <span class="key-digit">8</span>
+          <span class="key-letters">TUV</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="9" onclick="pressDigit('9')">
+          <span class="key-digit">9</span>
+          <span class="key-letters">WXYZ</span>
+        </button>
+
+        <button type="button" class="ios-key" data-digit="*" onclick="pressDigit('*')">
+          <span class="key-digit symbol-star">*</span>
+          <span class="key-letters">&nbsp;</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="0" onclick="pressDigit('0')">
+          <span class="key-digit">0</span>
+          <span class="key-letters plus-sign">+</span>
+        </button>
+        <button type="button" class="ios-key" data-digit="#" onclick="pressDigit('#')">
+          <span class="key-digit symbol-hash">#</span>
+          <span class="key-letters">&nbsp;</span>
+        </button>
+
+        <!-- Riga inferiore: Spazio | Tasto Verde Chiamata | Backspace -->
+        <div class="keypad-spacer" aria-hidden="true"></div>
+
+        <button type="button" class="ios-call-btn" onclick="startCall()" aria-label="Chiama">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
+          </svg>
+        </button>
+
+        <button id="backspace-btn" type="button" class="ios-backspace-btn" aria-label="Cancella cifra">
+          <svg width="26" height="20" viewBox="0 0 28 20" fill="none">
+            <path d="M9.6 1.5H24.5C25.6 1.5 26.5 2.4 26.5 3.5V16.5C26.5 17.6 25.6 18.5 24.5 18.5H9.6C8.9 18.5 8.3 18.2 7.9 17.6L1.8 10.6C1.4 10.2 1.4 9.8 1.8 9.4L7.9 2.4C8.3 1.8 8.9 1.5 9.6 1.5Z" fill="#3a3a3c"/>
+            <path d="M13.5 6.8L19.9 13.2M19.9 6.8L13.5 13.2" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 2: PREFERITI ==================== -->
+    <section id="view-favorites" class="ios-view">
+      <div class="subview-header">
+        <h1 class="subview-title">Preferiti</h1>
+      </div>
+      <div class="subview-body">
+        <div class="empty-state-center">
+          <strong>Nessun preferito</strong>
+          <p>Usa il tastierino per comporre i numeri telefonici trovati nei documenti dell'indagine.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 3: RECENTI ==================== -->
+    <section id="view-recents" class="ios-view">
+      <div class="subview-header">
+        <h1 class="subview-title">Recenti</h1>
+        <button id="clear-recents-btn" type="button" class="subview-action" onclick="clearRecents()">Cancella</button>
+      </div>
+      <div id="recents-list" class="subview-body"></div>
+    </section>
+
+    <!-- ==================== VISTA 4: CONTATTI ==================== -->
+    <section id="view-contacts" class="ios-view">
+      <div class="subview-header">
+        <h1 class="subview-title">Contatti</h1>
+      </div>
+      <div class="subview-body">
+        <div class="empty-state-center">
+          <strong>Nessun contatto</strong>
+          <p>La rubrica è vuota. Cerca i recapiti telefonici nei verbali, negli appunti e nei fascicoli.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BARRA TAB INFERIORE iOS ==================== -->
+    <nav class="ios-tabbar" aria-label="Menu telefono">
+      <button type="button" class="ios-tab" data-tab="favorites" onclick="switchTab('favorites')">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+        </svg>
+        <span>Preferiti</span>
+      </button>
+
+      <button type="button" class="ios-tab" data-tab="recents" onclick="switchTab('recents')">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+        </svg>
+        <span>Recenti</span>
+      </button>
+
+      <button type="button" class="ios-tab" data-tab="contacts" onclick="switchTab('contacts')">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/>
+        </svg>
+        <span>Contatti</span>
+      </button>
+
+      <button type="button" class="ios-tab active" data-tab="keypad" onclick="switchTab('keypad')">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="6" cy="5" r="2"/>
+          <circle cx="12" cy="5" r="2"/>
+          <circle cx="18" cy="5" r="2"/>
+          <circle cx="6" cy="11" r="2"/>
+          <circle cx="12" cy="11" r="2"/>
+          <circle cx="18" cy="11" r="2"/>
+          <circle cx="6" cy="17" r="2"/>
+          <circle cx="12" cy="17" r="2"/>
+          <circle cx="18" cy="17" r="2"/>
+          <circle cx="12" cy="22" r="1.7"/>
+        </svg>
+        <span>Tastierino</span>
+      </button>
+    </nav>
+
+    <!-- ==================== SCHERMATA CHIAMATA IN CORSO ==================== -->
+    <div id="ios-call-screen" class="ios-call-screen" role="dialog" aria-modal="true">
+      <div class="incall-header">
+        <div id="incall-status" class="incall-status">Sta chiamando...</div>
+        <div id="incall-primary" class="incall-primary">055 824 917</div>
+        <div id="incall-secondary" class="incall-secondary">Italia</div>
+      </div>
+
+      <!-- Trascrizione Vivavoce -->
+      <div class="transcript-panel">
+        <div class="transcript-header">
+          <span>Trascrizione Vivavoce</span>
+          <div id="voice-equalizer" class="equalizer" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div id="incall-transcript" class="transcript-scroll">Inoltro chiamata sulla rete telefonica...</div>
+        <button id="replay-audio-btn" type="button" class="replay-pill hidden" onclick="replayCurrentCallAudio()">
+          ↻ Riascolta registrazione
+        </button>
+      </div>
+
+      <!-- Controlli Chiamata iOS 3x2 -->
+      <div class="incall-controls-grid">
+        <div class="incall-ctrl-wrap">
+          <button id="ctrl-mute" type="button" class="incall-ctrl-btn" onclick="toggleMute()">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
+            </svg>
+          </button>
+          <span class="incall-ctrl-label">Muto</span>
+        </div>
+
+        <div class="incall-ctrl-wrap">
+          <button type="button" class="incall-ctrl-btn disabled-look" tabindex="-1">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="6" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="18" cy="5" r="2"/>
+              <circle cx="6" cy="11" r="2"/><circle cx="12" cy="11" r="2"/><circle cx="18" cy="11" r="2"/>
+              <circle cx="6" cy="17" r="2"/><circle cx="12" cy="17" r="2"/><circle cx="18" cy="17" r="2"/>
+            </svg>
+          </button>
+          <span class="incall-ctrl-label">Tastierino</span>
+        </div>
+
+        <div class="incall-ctrl-wrap">
+          <button id="ctrl-speaker" type="button" class="incall-ctrl-btn active-white" onclick="toggleSpeaker()">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+          </button>
+          <span class="incall-ctrl-label">Altoparlante</span>
+        </div>
+
+        <div class="incall-ctrl-wrap">
+          <button type="button" class="incall-ctrl-btn disabled-look" tabindex="-1">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+          </button>
+          <span class="incall-ctrl-label">Aggiungi</span>
+        </div>
+
+        <div class="incall-ctrl-wrap">
+          <button type="button" class="incall-ctrl-btn disabled-look" tabindex="-1">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+            </svg>
+          </button>
+          <span class="incall-ctrl-label">FaceTime</span>
+        </div>
+
+        <div class="incall-ctrl-wrap">
+          <button type="button" class="incall-ctrl-btn disabled-look" tabindex="-1">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/>
+            </svg>
+          </button>
+          <span class="incall-ctrl-label">Contatti</span>
+        </div>
+      </div>
+
+      <div class="incall-hangup-row">
+        <button type="button" class="ios-hangup-btn" onclick="endCall()" aria-label="Termina chiamata">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="transform: rotate(135deg);">
+            <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* =========================================================================
+       1. MOTORE AUDIO DTMF, SQUILLO ITALIANO, BIP SEGRETERIA E SINTESI VOCALE
+       ========================================================================= */
+    class IosPhoneAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.ringTimer = null;
+        this.speakerOn = true;
+        // Matrice standard frequenze DTMF (Hz)
+        this.dtmfMap = {
+          '1': [697, 1209], '2': [697, 1336], '3': [697, 1477],
+          '4': [770, 1209], '5': [770, 1336], '6': [770, 1477],
+          '7': [852, 1209], '8': [852, 1336], '9': [852, 1477],
+          '*': [941, 1209], '0': [941, 1336], '#': [941, 1477]
+        };
+      }
+
+      ensureCtx() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+      }
+
+      // Suono DTMF autentico alla pressione del tasto
+      playDTMF(digit) {
+        const pair = this.dtmfMap[digit];
+        if (!pair) return;
+        try {
+          this.ensureCtx();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.075, now + 0.01);
+          gain.gain.setValueAtTime(0.075, now + 0.11);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.145);
+
+          pair.forEach(freq => {
+            const osc = this.ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            osc.connect(gain);
+            osc.start(now);
+            osc.stop(now + 0.15);
+          });
+
+          gain.connect(this.ctx.destination);
+        } catch (e) {}
+      }
+
+      // Squillo telefonico italiano (425 Hz)
+      startRingback() {
+        this.stopRingback();
+        const burst = () => {
+          try {
+            this.ensureCtx();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(425, now);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.055, now + 0.02);
+            gain.gain.setValueAtTime(0.055, now + 0.85);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.92);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.93);
+          } catch (e) {}
+        };
+        burst();
+        this.ringTimer = setInterval(burst, 1900);
+      }
+
+      stopRingback() {
+        if (this.ringTimer) {
+          clearInterval(this.ringTimer);
+          this.ringTimer = null;
+        }
+      }
+
+      // Segnale acustico da segreteria telefonica (1000 Hz)
+      playAnsweringBeep() {
+        return new Promise(resolve => {
+          try {
+            this.ensureCtx();
+            if (!this.ctx) {
+              setTimeout(resolve, 480);
+              return;
+            }
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1000, now);
+            gain.gain.setValueAtTime(0.07, now);
+            gain.gain.setValueAtTime(0.07, now + 0.42);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.46);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.47);
+            setTimeout(resolve, 520);
+          } catch (e) {
+            setTimeout(resolve, 480);
+          }
+        });
+      }
+
+      stopSpeech() {
+        try {
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+          }
+        } catch (e) {}
+        setEqualizerActive(false);
+      }
+
+      // Riproduzione vocale a segmenti con tono/velocità personalizzati
+      speakSegments(segments, onComplete) {
+        this.stopSpeech();
+        if (!this.speakerOn || !('speechSynthesis' in window)) {
+          if (onComplete) onComplete();
+          return;
+        }
+
+        let idx = 0;
+        const voices = window.speechSynthesis.getVoices();
+        const itVoices = voices.filter(v => v.lang && v.lang.toLowerCase().includes('it'));
+
+        const next = () => {
+          if (idx >= segments.length || !isCallOpen) {
+            setEqualizerActive(false);
+            if (onComplete) onComplete();
+            return;
+          }
+
+          const seg = segments[idx++];
+          const utter = new SpeechSynthesisUtterance(seg.text);
+          utter.lang = 'it-IT';
+          utter.pitch = seg.pitch ?? 1.0;
+          utter.rate = seg.rate ?? 0.98;
+
+          if (itVoices.length > 0) {
+            // Sceglie una voce italiana coerente se disponibile sul dispositivo
+            if (seg.gender === 'female') {
+              const fem = itVoices.find(v => /alice|elsa|federica|giulia|paola|silvia|google italiano/i.test(v.name));
+              utter.voice = fem || itVoices[0];
+            } else {
+              const male = itVoices.find(v => /luca|cosimo|giorgio|marco|roberto/i.test(v.name));
+              utter.voice = male || itVoices[itVoices.length - 1];
+            }
+          }
+
+          utter.onstart = () => setEqualizerActive(true);
+          utter.onend = () => next();
+          utter.onerror = () => next();
+
+          try {
+            window.speechSynthesis.speak(utter);
+          } catch (e) {
+            next();
+          }
+        };
+
+        next();
+      }
+    }
+
+    const phoneAudio = new IosPhoneAudioEngine();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    /* =========================================================================
+       2. DATABASE UTENZE TELEFONICHE DELL'INDAGINE (7 NUMERI + INESISTENTE)
+       ========================================================================= */
+    const DIRECTORY = {
+      '055824917': {
+        title: 'Segreteria Foresteria Villa Valenti',
+        subtitle: 'Nastro Recuperato — 18/09/1996',
+        hasBeep: true,
+        transcript:
+          'SEG. AUTOMATICA: «Avete raggiunto lo studio di restauro della Foresteria di Villa Valenti. Al momento non posso rispondere, lasciate un messaggio dopo il segnale acustico.»\n\n' +
+          '[BIP — NASTRO RECUPERATO DEL 18 SETTEMBRE 1996, ORE 22:55]\n' +
+          'ELEONORA MARCHETTI: «...Pronto? Sì, sono io, Eleonora! Scusa il fiatone, c\'è un temporale terribile qui fuori... Senti, non posso parlare adesso, è appena arrivato qualcuno qui in foresteria, devo chiudere subito. Ti richiamo domattina presto, promesso!»',
+        part1: [
+          {
+            text: 'Avete raggiunto lo studio di restauro della Foresteria di Villa Valenti. Al momento non posso rispondere, lasciate un messaggio dopo il segnale acustico.',
+            gender: 'female',
+            pitch: 1.06,
+            rate: 1.0
+          }
+        ],
+        part2: [
+          {
+            text: 'Pronto? Sì, sono io, Eleonora! Scusa il fiatone, c\'è un temporale terribile qui fuori... Senti, non posso parlare adesso, è appena arrivato qualcuno qui in foresteria, devo chiudere subito. Ti richiamo domattina presto, promesso!',
+            gender: 'female',
+            pitch: 1.14,
+            rate: 1.12
+          }
+        ]
+      },
+
+      '055824104': {
+        title: 'Parrocchia San Lorenzo — Suor Agnese',
+        subtitle: 'Castelvecchio in Chianti',
+        hasBeep: false,
+        transcript:
+          'SUOR AGNESE: «Pronto, Parrocchia di San Lorenzo... Ah, siete voi che indagate sulla povera Eleonora? Che brava ragazza era, così devota al suo lavoro. Le portavo sempre una tazza di camomilla calda la sera in foresteria, perché il caffè le faceva venire subito la tachicardia, non lo toccava mai. E non si toglieva mai nemmeno la fede d\'oro della sua povera mamma: la teneva sempre al sicuro nella taschina interna del portafoglio o appuntata sotto la camicetta. Non sarebbe mai scappata lasciandola lì.»',
+        part1: [
+          {
+            text: 'Pronto, Parrocchia di San Lorenzo... Ah, siete voi che indagate sulla povera Eleonora? Che brava ragazza era, così devota al suo lavoro. Le portavo sempre una tazza di camomilla calda la sera in foresteria, perché il caffè le faceva venire subito la tachicardia, non lo toccava mai. E non si toglieva mai nemmeno la fede d\'oro della sua povera mamma: la teneva sempre al sicuro nella taschina interna del portafoglio o appuntata sotto la camicetta. Non sarebbe mai scappata lasciandola lì.',
+            gender: 'female',
+            pitch: 1.08,
+            rate: 0.90
+          }
+        ]
+      },
+
+      '3384910284': {
+        title: 'Marco Rinaldi',
+        subtitle: 'Impresa Edile / Ex Custode Tenuta',
+        hasBeep: false,
+        transcript:
+          'MARCO RINALDI: «Pronto, chi parla? Sì, sono Marco Rinaldi... Sentite, io con la scomparsa di Eleonora nel novantasei non c\'entro niente! Qui l\'unica scorciatoia per andare da Villa Valenti alla stazione è la Strada Consortile del Poggio, ma la sbarra automatica scende ogni notte alle dieci di sera fino alle sei del mattino, e il telecomando per aprirla ce l\'avevamo soltanto noi custodi residenti e la Contessa: chiunque altro doveva fare tutto il giro lungo sulla provinciale! E un\'altra cosa: io faccio il muratore da quando avevo sedici anni, una muratura storta e amatoriale come quella nella cripta non l\'avrei mai fatta neanche ad occhi chiusi!»',
+        part1: [
+          {
+            text: 'Pronto, chi parla? Sì, sono Marco Rinaldi... Sentite, io con la scomparsa di Eleonora nel novantasei non c\'entro niente! Qui l\'unica scorciatoia per andare da Villa Valenti alla stazione è la Strada Consortile del Poggio, ma la sbarra automatica scende ogni notte alle dieci di sera fino alle sei del mattino, e il telecomando per aprirla ce l\'avevamo soltanto noi custodi residenti e la Contessa: chiunque altro doveva fare tutto il giro lungo sulla provinciale! E un\'altra cosa: io faccio il muratore da quando avevo sedici anni, una muratura storta e amatoriale come quella nella cripta non l\'avrei mai fatta neanche ad occhi chiusi!',
+            gender: 'male',
+            pitch: 0.86,
+            rate: 1.02
+          }
+        ]
+      },
+
+      '055824900': {
+        title: 'Fondazione Culturale Villa Valenti',
+        subtitle: 'Centralino Presidenza',
+        hasBeep: false,
+        transcript:
+          'CENTRALINO FONDAZIONE: «Fondazione Culturale Villa Valenti, Presidenza del Professor Lorenzo Bellini. Gli uffici e il percorso museale restano temporaneamente chiusi al pubblico per lavori di consolidamento strutturale. Si ricorda che, per disposizione della Presidenza, l\'accesso alla Cappella Gentilizia e ai locali ipogei della cripta è interdetto a tutto il personale non espressamente autorizzato.»',
+        part1: [
+          {
+            text: 'Fondazione Culturale Villa Valenti, Presidenza del Professor Lorenzo Bellini. Gli uffici e il percorso museale restano temporaneamente chiusi al pubblico per lavori di consolidamento strutturale. Si ricorda che, per disposizione della Presidenza, l\'accesso alla Cappella Gentilizia e ai locali ipogei della cripta è interdetto a tutto il personale non espressamente autorizzato.',
+            gender: 'female',
+            pitch: 1.02,
+            rate: 0.98
+          }
+        ]
+      },
+
+      '055824905': {
+        title: 'Studio Legale Avv. Gianluca Moretti',
+        subtitle: 'Firenze',
+        hasBeep: false,
+        transcript:
+          'SEGRETERIA STUDIO MORETTI: «Studio Legale Avvocato Gianluca Moretti. Lo studio è momentaneamente chiuso. Vi informiamo che tutta la documentazione relativa alle perizie storico-artistiche del 1996 depositate presso la Soprintendenza è coperta da riserbo professionale. Per eventuali richieste ufficiali rivolgersi alla Contessa Beatrice Valenti o al Presidente della Fondazione, Professor Lorenzo Bellini.»',
+        part1: [
+          {
+            text: 'Studio Legale Avvocato Gianluca Moretti. Lo studio è momentaneamente chiuso. Vi informiamo che tutta la documentazione relativa alle perizie storico-artistiche del 1996 depositate presso la Soprintendenza è coperta da riserbo professionale. Per eventuali richieste ufficiali rivolgersi alla Contessa Beatrice Valenti o al Presidente della Fondazione, Professor Lorenzo Bellini.',
+            gender: 'female',
+            pitch: 1.12,
+            rate: 1.02
+          }
+        ]
+      },
+
+      '055824312': {
+        title: 'Antiquariato Edoardo Valli',
+        subtitle: 'Galleria & Stime d\'Arte',
+        hasBeep: false,
+        transcript:
+          'EDOARDO VALLI: «Galleria Antiquaria Edoardo Valli, lasciate un recapito dopo il segnale. Per chi chiamasse in merito alla vecchia stima del Reliquiario di San Lorenzo del 1996, ribadisco quanto già messo a verbale trent\'anni fa: la mia valutazione si basava esclusivamente sugli inventari storici della famiglia Valenti. Già all\'epoca, comunque, qualcun altro stava frugando nell\'archivio degli anni Cinquanta della villa.»',
+        part1: [
+          {
+            text: 'Galleria Antiquaria Edoardo Valli, lasciate un recapito dopo il segnale. Per chi chiamasse in merito alla vecchia stima del Reliquiario di San Lorenzo del 1996, ribadisco quanto già messo a verbale trent\'anni fa: la mia valutazione si basava esclusivamente sugli inventari storici della famiglia Valenti. Già all\'epoca, comunque, qualcun altro stava frugando nell\'archivio degli anni Cinquanta della villa.',
+            gender: 'male',
+            pitch: 0.82,
+            rate: 0.94
+          }
+        ]
+      },
+
+      '055824778': {
+        title: 'Studio Restauro Dott.ssa Chiara Ferri',
+        subtitle: 'Firenze',
+        hasBeep: false,
+        transcript:
+          'CHIARA FERRI: «Avete raggiunto lo studio della Dottoressa Chiara Ferri. Se chiamate per i fatti di Villa Valenti del settembre novantasei, ho già chiarito tutto: sì, il diciassette settembre avevamo litigato per quell\'appalto, e la sera dopo sono passata sotto la finestra della foresteria sotto la pioggia perché volevo prendere i suoi rilievi, ma la porta era chiusa a chiave dall\'interno e dentro si sentivano due persone discutere animatamente. Io me ne sono andata subito.»',
+        part1: [
+          {
+            text: 'Avete raggiunto lo studio della Dottoressa Chiara Ferri. Se chiamate per i fatti di Villa Valenti del settembre novantasei, ho già chiarito tutto: sì, il diciassette settembre avevamo litigato per quell\'appalto, e la sera dopo sono passata sotto la finestra della foresteria sotto la pioggia perché volevo prendere i suoi rilievi, ma la porta era chiusa a chiave dall\'interno e dentro si sentivano due persone discutere animatamente. Io me ne sono andata subito.',
+            gender: 'female',
+            pitch: 1.05,
+            rate: 1.04
+          }
+        ]
+      }
+    };
+
+    const UNKNOWN_ENTRY = {
+      title: 'Numero inesistente',
+      subtitle: 'Operatore Nazionale',
+      hasBeep: false,
+      isUnknown: true,
+      transcript: 'OPERATORE TELEFONICO: «Informazione gratuita: il numero selezionato non è attivo o è inesistente.»',
+      part1: [
+        {
+          text: 'Informazione gratuita: il numero selezionato non è attivo o è inesistente.',
+          gender: 'female',
+          pitch: 1.04,
+          rate: 1.02
+        }
+      ]
+    };
+
+    /* =========================================================================
+       3. STATO TASTIERINO, FORMATTAZIONE NUMERO & REGISTRO RECENTI
+       ========================================================================= */
+    const RECENTS_STORAGE_KEY = 'solvethiscase_ios_recents_v1';
+    let rawDigits = '';
+    let recentCalls = [];
+    let isCallOpen = false;
+    let isMuted = false;
+    let callTimerInterval = null;
+    let callConnectTimeout = null;
+    let callSeconds = 0;
+    let currentEntry = null;
+    let currentFormatted = '';
+
+    function loadRecents() {
+      try {
+        const saved = localStorage.getItem(RECENTS_STORAGE_KEY);
+        if (saved) recentCalls = JSON.parse(saved);
+      } catch (e) {}
+    }
+
+    function saveRecents() {
+      try {
+        localStorage.setItem(RECENTS_STORAGE_KEY, JSON.stringify(recentCalls));
+      } catch (e) {}
+    }
+
+    // Formattazione naturale dei numeri italiani (fissi 055 xxx xxx e cellulari 3xx xxx xxxx)
+    function formatItalianPhone(digits) {
+      if (!digits) return '';
+      if (digits.startsWith('055')) {
+        const p1 = digits.slice(0, 3);
+        const p2 = digits.slice(3, 6);
+        const p3 = digits.slice(6, 10);
+        return [p1, p2, p3].filter(Boolean).join(' ');
+      }
+      if (digits.startsWith('3') && digits.length <= 10) {
+        const p1 = digits.slice(0, 3);
+        const p2 = digits.slice(3, 6);
+        const p3 = digits.slice(6, 10);
+        return [p1, p2, p3].filter(Boolean).join(' ');
+      }
+      if (digits.startsWith('0') && digits.length <= 11) {
+        const p1 = digits.slice(0, 3);
+        const p2 = digits.slice(3, 7);
+        const p3 = digits.slice(7, 11);
+        return [p1, p2, p3].filter(Boolean).join(' ');
+      }
+      return digits;
+    }
+
+    function normalizeDialed(digits) {
+      let clean = digits.replace(/[\s\-()]/g, '');
+      if (clean.startsWith('+39')) clean = clean.slice(3);
+      if (clean.startsWith('0039')) clean = clean.slice(4);
+      return clean;
+    }
+
+    function updateKeypadUI() {
+      const display = document.getElementById('dialed-display');
+      const addBtn = document.getElementById('add-number-btn');
+      const backBtn = document.getElementById('backspace-btn');
+
+      const formatted = formatItalianPhone(rawDigits);
+      display.textContent = formatted;
+
+      // Riduce leggermente la dimensione font se il numero è molto lungo
+      if (formatted.length > 14) {
+        display.style.fontSize = '24px';
+      } else if (formatted.length > 11) {
+        display.style.fontSize = '29px';
+      } else {
+        display.style.fontSize = '';
+      }
+
+      const hasDigits = rawDigits.length > 0;
+      addBtn.classList.toggle('visible', hasDigits);
+      backBtn.classList.toggle('visible', hasDigits);
+    }
+
+    function pressDigit(digit) {
+      if (rawDigits.length >= 15) return;
+      rawDigits += digit;
+      phoneAudio.playDTMF(digit);
+      updateKeypadUI();
+    }
+
+    function deleteOneDigit() {
+      if (!rawDigits.length) return;
+      rawDigits = rawDigits.slice(0, -1);
+      updateKeypadUI();
+    }
+
+    function clearAllDigits() {
+      if (!rawDigits.length) return;
+      rawDigits = '';
+      updateKeypadUI();
+    }
+
+    // Gestione tap rapido e pressione prolungata su Backspace
+    (function setupBackspaceHold() {
+      const btn = document.getElementById('backspace-btn');
+      let holdTimer = null;
+      let didHoldClear = false;
+
+      const startHold = () => {
+        didHoldClear = false;
+        holdTimer = setTimeout(() => {
+          didHoldClear = true;
+          clearAllDigits();
+        }, 520);
+      };
+
+      const endHold = () => {
+        if (holdTimer) {
+          clearTimeout(holdTimer);
+          holdTimer = null;
+        }
+        if (!didHoldClear) {
+          deleteOneDigit();
+        }
+      };
+
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        startHold();
+      });
+      btn.addEventListener('pointerup', endHold);
+      btn.addEventListener('pointerleave', () => {
+        if (holdTimer) clearTimeout(holdTimer);
+      });
+    })();
+
+    function handleAddNumberClick() {
+      showToast('Rubrica bloccata durante l\'indagine');
+    }
+
+    let toastTimeout = null;
+    function showToast(msg) {
+      const el = document.getElementById('ios-toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    /* =========================================================================
+       4. NAVIGAZIONE TAB BAR & RECENTI
+       ========================================================================= */
+    function switchTab(tabName) {
+      document.querySelectorAll('.ios-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.ios-tab').forEach(t => t.classList.remove('active'));
+
+      const targetView = document.getElementById(`view-${tabName}`);
+      const targetTab = document.querySelector(`.ios-tab[data-tab="${tabName}"]`);
+      if (targetView) targetView.classList.add('active');
+      if (targetTab) targetTab.classList.add('active');
+
+      if (tabName === 'recents') {
+        renderRecents();
+      }
+    }
+
+    function renderRecents() {
+      const container = document.getElementById('recents-list');
+      const clearBtn = document.getElementById('clear-recents-btn');
+
+      if (!recentCalls.length) {
+        clearBtn.style.visibility = 'hidden';
+        container.innerHTML = `
+          <div class="empty-state-center">
+            <strong>Nessuna chiamata recente</strong>
+            <p>Le chiamate effettuate durante questa sessione compariranno qui per essere riascoltate.</p>
+          </div>
+        `;
+        return;
+      }
+
+      clearBtn.style.visibility = 'visible';
+      container.innerHTML = recentCalls.map((item, idx) => `
+        <div class="recent-row" onclick="dialFromRecent(${idx})">
+          <div class="recent-info">
+            <div class="recent-title ${item.isUnknown ? 'unknown' : ''}">${escapeHtml(item.title)}</div>
+            <div class="recent-sub">${escapeHtml(item.formattedNumber)}</div>
+          </div>
+          <div class="recent-time">
+            <span>${escapeHtml(item.time)}</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#0a84ff">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function dialFromRecent(index) {
+      const item = recentCalls[index];
+      if (!item) return;
+      rawDigits = item.rawDigits;
+      updateKeypadUI();
+      switchTab('keypad');
+      startCall();
+    }
+
+    function clearRecents() {
+      recentCalls = [];
+      saveRecents();
+      renderRecents();
+    }
+
+    /* =========================================================================
+       5. GESTIONE CHIAMATA IN CORSO & RIPRODUZIONE AUDIO
+       ========================================================================= */
+    function startCall() {
+      if (!rawDigits.length) {
+        if (recentCalls.length > 0) {
+          // Come su iPhone, premere chiama a campo vuoto richiama l'ultimo numero digitato
+          rawDigits = recentCalls[0].rawDigits;
+          updateKeypadUI();
+        }
+        return;
+      }
+
+      const normalized = normalizeDialed(rawDigits);
+      const formatted = formatItalianPhone(rawDigits);
+      const entry = DIRECTORY[normalized] || UNKNOWN_ENTRY;
+
+      currentEntry = entry;
+      currentFormatted = formatted;
+      isCallOpen = true;
+
+      // Salva nei Recenti
+      const timeStr = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      recentCalls.unshift({
+        rawDigits: rawDigits,
+        formattedNumber: formatted,
+        title: entry.isUnknown ? formatted : entry.title,
+        isUnknown: Boolean(entry.isUnknown),
+        time: timeStr
+      });
+      if (recentCalls.length > 25) recentCalls.pop();
+      saveRecents();
+
+      // Prepara UI schermata chiamata
+      const callScreen = document.getElementById('ios-call-screen');
+      const statusEl = document.getElementById('incall-status');
+      const primaryEl = document.getElementById('incall-primary');
+      const secondaryEl = document.getElementById('incall-secondary');
+      const transcriptEl = document.getElementById('incall-transcript');
+      const replayBtn = document.getElementById('replay-audio-btn');
+
+      statusEl.textContent = 'Sta chiamando...';
+      statusEl.classList.remove('live');
+      primaryEl.textContent = formatted;
+      secondaryEl.textContent = 'Italia';
+      transcriptEl.textContent = 'Connessione alla linea telefonica in corso...';
+      replayBtn.classList.add('hidden');
+      setEqualizerActive(false);
+
+      callScreen.classList.add('open');
+      phoneAudio.startRingback();
+
+      callConnectTimeout = setTimeout(async () => {
+        if (!isCallOpen) return;
+        phoneAudio.stopRingback();
+
+        statusEl.classList.add('live');
+        primaryEl.textContent = entry.title;
+        secondaryEl.textContent = formatted;
+        transcriptEl.textContent = entry.transcript;
+
+        // Avvia timer chiamata 00:00
+        callSeconds = 0;
+        statusEl.textContent = '00:00';
+        callTimerInterval = setInterval(() => {
+          callSeconds++;
+          const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+          const s = String(callSeconds % 60).padStart(2, '0');
+          statusEl.textContent = `${m}:${s}`;
+        }, 1000);
+
+        await playEntryAudio(entry);
+      }, 2100);
+    }
+
+    async function playEntryAudio(entry) {
+      const replayBtn = document.getElementById('replay-audio-btn');
+      replayBtn.classList.add('hidden');
+
+      await new Promise(resolve => {
+        phoneAudio.speakSegments(entry.part1, resolve);
+      });
+
+      if (!isCallOpen) return;
+
+      if (entry.hasBeep && entry.part2) {
+        await phoneAudio.playAnsweringBeep();
+        if (!isCallOpen) return;
+        await new Promise(resolve => {
+          phoneAudio.speakSegments(entry.part2, resolve);
+        });
+      }
+
+      if (isCallOpen) {
+        replayBtn.classList.remove('hidden');
+      }
+    }
+
+    function replayCurrentCallAudio() {
+      if (!isCallOpen || !currentEntry) return;
+      playEntryAudio(currentEntry);
+    }
+
+    function toggleSpeaker() {
+      phoneAudio.speakerOn = !phoneAudio.speakerOn;
+      document.getElementById('ctrl-speaker').classList.toggle('active-white', phoneAudio.speakerOn);
+      if (!phoneAudio.speakerOn) {
+        phoneAudio.stopSpeech();
+      } else if (isCallOpen && currentEntry) {
+        replayCurrentCallAudio();
+      }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('ctrl-mute').classList.toggle('active-white', isMuted);
+    }
+
+    function endCall() {
+      isCallOpen = false;
+      if (callConnectTimeout) {
+        clearTimeout(callConnectTimeout);
+        callConnectTimeout = null;
+      }
+      if (callTimerInterval) {
+        clearInterval(callTimerInterval);
+        callTimerInterval = null;
+      }
+      phoneAudio.stopRingback();
+      phoneAudio.stopSpeech();
+      document.getElementById('ios-call-screen').classList.remove('open');
+    }
+
+    function setEqualizerActive(active) {
+      document.getElementById('voice-equalizer').classList.toggle('speaking', active);
+    }
+
+    /* =========================================================================
+       6. SUPPORTO TASTIERA FISICA & OROLOGIO STATUS BAR
+       ========================================================================= */
+    document.addEventListener('keydown', (e) => {
+      if (isCallOpen) {
+        if (e.key === 'Escape') endCall();
+        return;
+      }
+      if (/^[0-9*#]$/.test(e.key)) {
+        e.preventDefault();
+        const keyBtn = document.querySelector(`.ios-key[data-digit="${CSS.escape(e.key)}"]`);
+        if (keyBtn) {
+          keyBtn.classList.add('pressed');
+          setTimeout(() => keyBtn.classList.remove('pressed'), 110);
+        }
+        pressDigit(e.key);
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        deleteOneDigit();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        startCall();
+      }
+    });
+
+    function updateStatusBarClock() {
+      const el = document.getElementById('ios-clock');
+      if (el) {
+        el.textContent = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadRecents();
+      updateKeypadUI();
+      updateStatusBarClock();
+      setInterval(updateStatusBarClock, 15000);
+    });
+  </script>
+</body>
+</html>
