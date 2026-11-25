@@ -1,1 +1,1221 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Archivio Centrale Deposizioni Audio 1996 — Stazione Carabinieri Castelvecchio in Chianti</title>
+  <style>
+    /* =========================================================================
+       1. DESIGN TOKENS — TERMINALE ISTITUZIONALE / ARCHIVIO RISERVATO ARMA 1996
+       ========================================================================= */
+    :root {
+      --bg-terminal: #090e16;
+      --bg-panel: #0f1724;
+      --bg-card: #131e2e;
+      --bg-card-active: #18263b;
+      --arma-navy: #14284b;
+      --arma-red: #b8292f;
+      --arma-gold: #d4af37;
+      --crt-green: #38e58c;
+      --crt-amber: #f5b942;
+      --text-primary: #e6ecf5;
+      --text-secondary: #8c9cb5;
+      --border-subtle: rgba(140, 156, 181, 0.22);
+      --border-strong: rgba(212, 175, 55, 0.42);
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg-terminal);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* Leggera trama CRT / griglia tecnica di sfondo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56, 229, 140, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 229, 140, 0.025) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 14px 48px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================================================================
+       2. INTESTAZIONE ISTITUZIONALE ARMA DEI CARABINIERI (1996)
+       ========================================================================= */
+    .gov-banner {
+      background: linear-gradient(180deg, #13233d 0%, #0d1729 100%);
+      border: 1px solid var(--border-subtle);
+      border-top: 3px solid var(--arma-red);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .gov-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .gov-crest-group {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .arma-badge-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1a335e 0%, #0e1c36 100%);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--arma-gold);
+    }
+
+    .gov-ministry {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--arma-gold);
+      font-weight: 700;
+    }
+
+    .gov-title {
+      font-size: clamp(16px, 2.8vw, 20px);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .gov-sub {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .classification-stamp {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #ff7b80;
+      background: rgba(184, 41, 47, 0.16);
+      border: 1px solid rgba(184, 41, 47, 0.55);
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .gov-status-strip {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--crt-green);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--crt-green);
+      box-shadow: 0 0 8px var(--crt-green);
+    }
+
+    /* =========================================================================
+       3. SCHERMATA DI LOGIN TERMINALE
+       ========================================================================= */
+    .login-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 450px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 26px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .login-card-header {
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed var(--border-subtle);
+    }
+
+    .login-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--crt-amber);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .login-card-header h2 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .login-card-header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: #c2cfe2;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .field-input {
+      width: 100%;
+      background-color: #080d14;
+      border: 1px solid rgba(140, 156, 181, 0.35);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      color: var(--crt-green);
+      letter-spacing: 0.8px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field-input::placeholder {
+      color: rgba(140, 156, 181, 0.45);
+    }
+
+    .field-input:focus {
+      border-color: var(--crt-green);
+      box-shadow: 0 0 0 3px rgba(56, 229, 140, 0.14);
+    }
+
+    .login-error {
+      background-color: rgba(184, 41, 47, 0.18);
+      border: 1px solid rgba(184, 41, 47, 0.6);
+      color: #ff999d;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .login-error.visible {
+      display: block;
+    }
+
+    .btn-primary-gov {
+      width: 100%;
+      background: linear-gradient(180deg, #1f427a 0%, #152e57 100%);
+      border: 1px solid rgba(114, 159, 232, 0.45);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 13px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: filter 0.15s ease, transform 0.08s ease;
+    }
+
+    .btn-primary-gov:hover {
+      filter: brightness(1.12);
+    }
+
+    .btn-primary-gov:active {
+      transform: scale(0.99);
+    }
+
+    .login-footnote {
+      margin-top: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    /* =========================================================================
+       4. ARCHIVIO FASCICOLO & 6 NASTRI MAGNETICI DIGITALIZZATI
+       ========================================================================= */
+    .archive-dashboard {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .archive-dashboard.active {
+      display: flex;
+    }
+
+    /* Intestazione Fascicolo Prot. 412/96-R.G. */
+    .dossier-header-card {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-left: 4px solid var(--arma-gold);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .dossier-protocol {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--arma-gold);
+      font-weight: 700;
+      letter-spacing: 0.8px;
+    }
+
+    .dossier-subject {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 4px 0;
+    }
+
+    .dossier-meta-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(184, 41, 47, 0.2);
+      border-color: rgba(184, 41, 47, 0.5);
+      color: #ff999d;
+    }
+
+    /* Barra controllo globale audio */
+    .audio-toolbar {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 11px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .audio-toolbar-info {
+      color: var(--text-secondary);
+    }
+
+    .audio-toolbar-info strong {
+      color: var(--crt-green);
+    }
+
+    .btn-stop-all {
+      background: rgba(184, 41, 47, 0.2);
+      border: 1px solid rgba(184, 41, 47, 0.55);
+      color: #ffb3b6;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-stop-all:hover {
+      background: rgba(184, 41, 47, 0.35);
+    }
+
+    /* Lista Schede Nastro */
+    .tapes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tape-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 11px;
+      padding: 16px 18px;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .tape-card.playing {
+      background-color: var(--bg-card-active);
+      border-color: var(--crt-green);
+      box-shadow: 0 0 0 1px rgba(56, 229, 140, 0.2), 0 10px 28px rgba(0, 0, 0, 0.4);
+    }
+
+    .tape-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tape-code {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--crt-amber);
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .tape-witness {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .tape-role {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .tape-date-badge {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #c2cfe2;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 9px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    /* Lettore Nastro Magnetico */
+    .tape-deck {
+      background-color: #090e16;
+      border: 1px solid rgba(140, 156, 181, 0.24);
+      border-radius: 9px;
+      padding: 11px 13px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tape-play-btn {
+      background: linear-gradient(180deg, #1d3c6e 0%, #142a4f 100%);
+      border: 1px solid rgba(114, 159, 232, 0.45);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 9px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 138px;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    .tape-card.playing .tape-play-btn {
+      background: linear-gradient(180deg, #196b43 0%, #104a2e 100%);
+      border-color: var(--crt-green);
+      color: #e6fff2;
+    }
+
+    /* Bobine simboliche animabili */
+    .reel-pair {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 7px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .reel-wheel {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px dashed #8c9cb5;
+      display: inline-block;
+    }
+
+    .tape-card.playing .reel-wheel {
+      border-color: var(--crt-green);
+      animation: spinReel 2.2s linear infinite;
+    }
+
+    @keyframes spinReel {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .tape-progress-wrap {
+      flex: 1;
+      min-width: 160px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .tape-progress-track {
+      width: 100%;
+      height: 7px;
+      background-color: #1a2436;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tape-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #27b36d 0%, var(--crt-green) 100%);
+      transition: width 0.2s linear;
+    }
+
+    .tape-time-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .tape-transcript-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: #c2cfe2;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .tape-transcript-btn:hover {
+      border-color: var(--arma-gold);
+      color: var(--arma-gold);
+    }
+
+    /* Box Trascrizione Integrale */
+    .transcript-box {
+      margin-top: 12px;
+      background-color: #080d14;
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-radius: 8px;
+      padding: 14px 15px;
+      display: none;
+    }
+
+    .transcript-box.open {
+      display: block;
+    }
+
+    .transcript-box-head {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--arma-gold);
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed rgba(212, 175, 55, 0.25);
+    }
+
+    .transcript-box-body {
+      font-size: 13.5px;
+      line-height: 1.62;
+      color: #dce4f0;
+      white-space: pre-wrap;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .tape-deck {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .tape-play-btn, .tape-transcript-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- ==================== HEADER ISTITUZIONALE ==================== -->
+    <header class="gov-banner">
+      <div class="gov-top-row">
+        <div class="gov-crest-group">
+          <div class="arma-badge-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4.18l5 2.22v3.6c0 3.79-2.56 7.31-5 8.39-2.44-1.08-5-4.6-5-8.39V7.4l5-2.22z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="gov-ministry">Legione Carabinieri Toscana — Comando Provinciale di Firenze</div>
+            <h1 class="gov-title">Archivio Centrale Deposizioni Audio 1996</h1>
+            <div class="gov-sub">Stazione Carabinieri di Castelvecchio in Chianti (FI) — Sistema Digitalizzazione Nastri</div>
+          </div>
+        </div>
+        <div class="classification-stamp">RISERVATO — ATTI P.G.</div>
+      </div>
+
+      <div class="gov-status-strip">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span id="terminal-status-label">TERMINALE ARCHIVIO ATTIVO — IN ATTESA AUTENTICAZIONE</span>
+        </div>
+        <div>SERVER LEGACY: CC-FI-CASTELVECCHIO-96</div>
+      </div>
+    </header>
+
+    <!-- ==================== SCHERMATA 1: LOGIN OPERATORE ==================== -->
+    <section id="login-section" class="login-wrapper">
+      <div class="login-card">
+        <div class="login-card-header">
+          <div class="login-tag">Accesso Riservato Personale dell'Arma</div>
+          <h2>Autenticazione Operatore</h2>
+          <p>Inserire la matricola di servizio e il codice di accesso assegnato all'archivio fonografico del 1996.</p>
+        </div>
+
+        <form onsubmit="handleLoginSubmit(event)" novalidate>
+          <div class="field-group">
+            <label for="input-matricola" class="field-label">Matricola Operatore</label>
+            <input
+              id="input-matricola"
+              type="text"
+              class="field-input"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Es. XXXXXXXX-00"
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="input-password" class="field-label">Codice Accesso Archivio</label>
+            <input
+              id="input-password"
+              type="password"
+              class="field-input"
+              autocomplete="off"
+              placeholder="••••••••••••"
+            />
+          </div>
+
+          <div id="login-error-box" class="login-error" role="alert">
+            ACCESSO NEGATO: Matricola o Codice Accesso non validi. Verificare le credenziali nel fascicolo.
+          </div>
+
+          <button type="submit" class="btn-primary-gov">Accedi al Fascicolo Audio</button>
+        </form>
+
+        <div class="login-footnote">
+          AVVERTENZA DI LEGGE: La consultazione e la riproduzione dei supporti magnetici di Polizia Giudiziaria sono consentite esclusivamente al personale autorizzato.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCHERMATA 2: FASCICOLO AUDIO 1996 ==================== -->
+    <main id="archive-dashboard" class="archive-dashboard">
+
+      <!-- Scheda Intestazione Fascicolo -->
+      <section class="dossier-header-card">
+        <div>
+          <div class="dossier-protocol">FASCICOLO FONOGRAFICO PROT. N. 412/96-R.G.</div>
+          <h2 class="dossier-subject">Indagine: Scomparsa Dott.ssa Eleonora Marchetti &amp; Furto Reliquiario</h2>
+          <div class="dossier-meta-grid">
+            <span><strong>Ufficio:</strong> Stazione CC Castelvecchio in Chianti</span>
+            <span><strong>Ufficiale Verbalizzante:</strong> Mar. Capo Franco De Santis</span>
+            <span><strong>Supporti:</strong> 6 Bobine Magnetiche Digitalizzate</span>
+          </div>
+        </div>
+        <button type="button" class="btn-logout" onclick="handleLogout()">Disconnetti</button>
+      </section>
+
+      <!-- Barra di Stato Audio -->
+      <section class="audio-toolbar">
+        <div class="audio-toolbar-info">
+          Stato riproduzione: <strong id="global-player-status">Nessun nastro in ascolto</strong>
+        </div>
+        <button type="button" class="btn-stop-all" onclick="stopAllPlayback()">■ Interrompi Audio</button>
+      </section>
+
+      <!-- Elenco 6 Nastri Digitalizzati -->
+      <section id="tapes-container" class="tapes-list" aria-label="Elenco deposizioni audio"></section>
+
+    </main>
+
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. MOTORE EFFETTO NASTRO MAGNETICO (WEB AUDIO API) + SINTESI VOCALE (WEB SPEECH API)
+       ========================================================================= */
+    class PoliceTapeAudioEngine {
+      constructor() {
+        this.ctx = null;
+      }
+
+      ensureContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+      }
+
+      // Simula lo scatto meccanico del registratore a bobine + fruscio magnetico iniziale
+      playTapeEngageEffect() {
+        return new Promise(resolve => {
+          try {
+            this.ensureContext();
+            if (!this.ctx) {
+              setTimeout(resolve, 420);
+              return;
+            }
+
+            const now = this.ctx.currentTime;
+
+            // 1. Click meccanico testina (impulso breve a 190 Hz)
+            const clickOsc = this.ctx.createOscillator();
+            const clickGain = this.ctx.createGain();
+            clickOsc.type = 'triangle';
+            clickOsc.frequency.setValueAtTime(210, now);
+            clickOsc.frequency.exponentialRampToValueAtTime(65, now + 0.055);
+            clickGain.gain.setValueAtTime(0.14, now);
+            clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+            clickOsc.connect(clickGain);
+            clickGain.connect(this.ctx.destination);
+            clickOsc.start(now);
+            clickOsc.stop(now + 0.065);
+
+            // 2. Fruscio nastro magnetico analogo (rumore bianco filtrato banda telefonica/bobina)
+            const duration = 0.55;
+            const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+            const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              data[i] = (Math.random() * 2 - 1) * 0.35;
+            }
+
+            const noiseSource = this.ctx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+
+            const bandpass = this.ctx.createBiquadFilter();
+            bandpass.type = 'bandpass';
+            bandpass.frequency.setValueAtTime(1450, now);
+            bandpass.Q.setValueAtTime(1.4, now);
+
+            const hissGain = this.ctx.createGain();
+            hissGain.gain.setValueAtTime(0.001, now + 0.05);
+            hissGain.gain.linearRampToValueAtTime(0.045, now + 0.14);
+            hissGain.gain.exponentialRampToValueAtTime(0.002, now + 0.58);
+
+            noiseSource.connect(bandpass);
+            bandpass.connect(hissGain);
+            hissGain.connect(this.ctx.destination);
+
+            noiseSource.start(now + 0.04);
+            noiseSource.stop(now + 0.6);
+
+            setTimeout(resolve, 560);
+          } catch (e) {
+            setTimeout(resolve, 420);
+          }
+        });
+      }
+
+      stopVoice() {
+        try {
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+          }
+        } catch (e) {}
+      }
+
+      speakTape(tape, onEndCallback) {
+        this.stopVoice();
+        if (!('speechSynthesis' in window)) {
+          return false;
+        }
+
+        try {
+          const utter = new SpeechSynthesisUtterance(tape.spokenText);
+          utter.lang = 'it-IT';
+          utter.pitch = tape.pitch;
+          utter.rate = tape.rate;
+
+          const voices = window.speechSynthesis.getVoices();
+          const itVoices = voices.filter(v => v.lang && v.lang.toLowerCase().includes('it'));
+
+          if (itVoices.length > 0) {
+            if (tape.gender === 'female') {
+              const fem = itVoices.find(v => /alice|elsa|federica|giulia|paola|silvia|google italiano/i.test(v.name));
+              utter.voice = fem || itVoices[0];
+            } else {
+              const male = itVoices.find(v => /luca|cosimo|giorgio|marco|roberto/i.test(v.name));
+              utter.voice = male || itVoices[itVoices.length - 1];
+            }
+          }
+
+          utter.onend = () => {
+            if (onEndCallback) onEndCallback();
+          };
+          utter.onerror = () => {
+            if (onEndCallback) onEndCallback();
+          };
+
+          window.speechSynthesis.speak(utter);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+    }
+
+    const tapeAudio = new PoliceTapeAudioEngine();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    /* =========================================================================
+       2. DATABASE DEI 6 NASTRI MAGNETICI DEL SETTEMBRE 1996
+       ========================================================================= */
+    const DEPOSITION_TAPES = [
+      {
+        id: 'tape_1',
+        code: 'NASTRO 01/96 — REPERTO FONOGRAFICO A',
+        witness: 'Marco Rinaldi',
+        role: 'Custode residente e muratore presso Tenuta Villa Valenti',
+        recordedAt: '19/09/1996 — Ore 11:20',
+        durationSec: 44,
+        gender: 'male',
+        pitch: 0.88,
+        rate: 1.0,
+        spokenText:
+          'Verbale audio del 19 settembre 1996, ore 11 e 20. Dichiarante Marco Rinaldi. ' +
+          'Maresciallo, io ieri sera alle sei e mezza ho chiuso a chiave il cancello principale della villa e sono tornato a casa dai miei genitori, con quel diluvio non sono più uscito. ' +
+          'E poi sentite a me: la Dottoressa Eleonora non può essere scappata in macchina verso la stazione dopo le dieci di sera! ' +
+          'L\'unica scorciatoia diretta per la stazione è la Strada Consortile del Poggio, ma la sbarra automatizzata al chilometro zero virgola quattro scende ogni notte alle 22:00 e resta bloccata fino alle sei del mattino. ' +
+          'Il telecomando per aprirla di notte ce l\'abbiamo soltanto noi custodi residenti e la Contessa Valenti: chiunque altro doveva fare tutto il giro lungo sulla provinciale SP 42! ' +
+          'La Panda di Eleonora? L\'ho vista stamattina alle sette e mezza nel piazzale della stazione mentre andavo a prendere il giornale, ma io non l\'ho toccata.',
+        transcript:
+          '[INIZIO REGISTRAZIONE — CASERMA CC CASTELVECCHIO, 19/09/1996 ORE 11:20]\n' +
+          'MAR. DE SANTIS: «Dichiarazione spontanea di Marco Rinaldi, nato il 04/05/1968, custode della Tenuta Valenti.»\n\n' +
+          'MARCO RINALDI: «Maresciallo, io ieri sera alle sei e mezza ho chiuso a chiave il cancello principale della villa e sono tornato a casa dai miei genitori, con quel diluvio non sono più uscito.\n' +
+          'E poi sentite a me: la Dottoressa Eleonora non può essere scappata in macchina verso la stazione dopo le dieci di sera! L\'unica scorciatoia diretta per la stazione è la Strada Consortile del Poggio, ma la sbarra automatizzata al chilometro 0,4 scende ogni notte alle 22:00 e resta bloccata fino alle 06:00 del mattino. Il telecomando per aprirla di notte ce l\'abbiamo soltanto noi custodi residenti e la Contessa Valenti: chiunque altro doveva fare tutto il giro lungo sulla provinciale SP 42!\n' +
+          'La Panda di Eleonora? L\'ho vista stamattina alle sette e mezza nel piazzale della stazione mentre andavo a prendere il giornale, ma io non l\'ho toccata.»'
+      },
+      {
+        id: 'tape_2',
+        code: 'NASTRO 02/96 — REPERTO FONOGRAFICO B',
+        witness: 'Contessa Beatrice Valenti',
+        role: 'Proprietaria di Villa Valenti e Presidente Onoraria Fondazione',
+        recordedAt: '20/09/1996 — Ore 10:05',
+        durationSec: 40,
+        gender: 'female',
+        pitch: 0.96,
+        rate: 0.95,
+        spokenText:
+          'Verbale audio del 20 settembre 1996, ore 10 e 05. Dichiarante Contessa Beatrice Valenti. ' +
+          'Maresciallo De Santis, trovo semplicemente oltraggioso che si dubiti della mia parola. La notte del 18 settembre ero a Roma per il ricevimento benefico a Palazzo Borghese, ho pernottato all\'Hotel Eden e ho già consegnato al suo comando tutte le ricevute dei pedaggi autostradali. ' +
+          'Quella restauratrice, la Marchetti, era piena di debiti e di affitti arretrati: ha approfittato della mia assenza per sottrarre il Reliquiario di San Lorenzo dalla sacrestia e far perdere le proprie tracce. ' +
+          'Vi chiedo soltanto di chiudere al più presto i rilievi nella cappella: l\'affresco cinquecentesco è delicatissimo e l\'assicurazione pretende la chiusura immediata del sinistro.',
+        transcript:
+          '[INIZIO REGISTRAZIONE — VILLA VALENTI, SALONE NOBILE, 20/09/1996 ORE 10:05]\n' +
+          'MAR. DE SANTIS: «Audizione della Contessa Beatrice Valenti, nata il 19/11/1942.»\n\n' +
+          'CONTESSA BEATRICE VALENTI: «Maresciallo De Santis, trovo semplicemente oltraggioso che si dubiti della mia parola. La notte del 18 settembre ero a Roma per il ricevimento benefico a Palazzo Borghese, ho pernottato all\'Hotel Eden e ho già consegnato al suo comando tutte le ricevute dei pedaggi autostradali.\n' +
+          'Quella restauratrice, la Marchetti, era piena di debiti e di affitti arretrati: ha approfittato della mia assenza per sottrarre il Reliquiario di San Lorenzo dalla sacrestia e far perdere le proprie tracce. Vi chiedo soltanto di chiudere al più presto i rilievi nella cappella: l\'affresco cinquecentesco è delicatissimo e l\'assicurazione pretende la chiusura immediata del sinistro.»'
+      },
+      {
+        id: 'tape_3',
+        code: 'NASTRO 03/96 — REPERTO FONOGRAFICO C',
+        witness: 'Dott. Lorenzo Bellini',
+        role: 'Ricercatore Storico dell\'Arte — Università di Firenze',
+        recordedAt: '20/09/1996 — Ore 15:40',
+        durationSec: 42,
+        gender: 'male',
+        pitch: 1.02,
+        rate: 1.03,
+        spokenText:
+          'Verbale audio del 20 settembre 1996, ore 15 e 40. Dichiarante Dottor Lorenzo Bellini. ' +
+          'Sono rimasto sconvolto dalla notizia, Maresciallo. Ero io ad aver raccomandato la Dottoressa Marchetti per il restauro dell\'affresco del Martirio di San Lorenzo, dopo averne certificato l\'autenticità cinquecentesca nella mia relazione di giugno. ' +
+          'La sera del 18 settembre non ero a Castelvecchio: mi trovavo a Firenze per il convegno universitario sulla pittura rinascimentale toscana. ' +
+          'Dopo la sessione serale sono andato a cenare da solo alla Trattoria Da Ivo, proprio accanto alla stazione di Santa Maria Novella: ecco lo scontrino fiscale delle ore 21:15. Poi sono rientrato nel mio appartamento a Firenze e non ho ricevuto alcuna telefonata da Eleonora.',
+        transcript:
+          '[INIZIO REGISTRAZIONE — CASERMA CC CASTELVECCHIO, 20/09/1996 ORE 15:40]\n' +
+          'MAR. DE SANTIS: «Audizione del Dott. Lorenzo Bellini, nato il 12/02/1965, consulente storico-artistico.»\n\n' +
+          'DOTT. LORENZO BELLINI: «Sono rimasto sconvolto dalla notizia, Maresciallo. Ero io ad aver raccomandato la Dottoressa Marchetti per il restauro dell\'affresco del Martirio di San Lorenzo, dopo averne certificato l\'autenticità cinquecentesca nella mia relazione di giugno.\n' +
+          'La sera del 18 settembre non ero a Castelvecchio: mi trovavo a Firenze per il convegno universitario sulla pittura rinascimentale toscana. Dopo la sessione serale sono andato a cenare da solo alla Trattoria Da Ivo, proprio accanto alla stazione di Santa Maria Novella: ecco lo scontrino fiscale delle ore 21:15. Poi sono rientrato nel mio appartamento a Firenze e non ho ricevuto alcuna telefonata da Eleonora.»'
+      },
+      {
+        id: 'tape_4',
+        code: 'NASTRO 04/96 — REPERTO FONOGRAFICO D',
+        witness: 'Dott.ssa Chiara Ferri',
+        role: 'Restauratrice esterna — Studio Conservazione Firenze',
+        recordedAt: '21/09/1996 — Ore 09:30',
+        durationSec: 39,
+        gender: 'female',
+        pitch: 1.10,
+        rate: 1.05,
+        spokenText:
+          'Verbale audio del 21 settembre 1996, ore 9 e 30. Dichiarante Dottoressa Chiara Ferri. ' +
+          'Non lo nego, Maresciallo: il 17 settembre ho litigato furiosamente con Eleonora nel cortile della villa perché quell\'incarico della Soprintendenza spettava al mio studio per anzianità di curriculum. ' +
+          'Ma da una lite professionale a un furto o a una scomparsa ce ne passa! La sera del 18 sono rientrata presto nel mio affittacamere alla Locanda del Borgo perché pioveva a dirotto, come vi ha confermato anche il gestore. ' +
+          'Eleonora era ambiziosa e riservatissima: negli ultimi due giorni teneva sempre chiusa la porta della foresteria e non faceva avvicinare nessuno ai suoi rilievi chimici.',
+        transcript:
+          '[INIZIO REGISTRAZIONE — CASERMA CC CASTELVECCHIO, 21/09/1996 ORE 09:30]\n' +
+          'MAR. DE SANTIS: «Audizione della Dott.ssa Chiara Ferri, nata il 28/07/1966, restauratrice.»\n\n' +
+          'DOTT.SSA CHIARA FERRI: «Non lo nego, Maresciallo: il 17 settembre ho litigato furiosamente con Eleonora nel cortile della villa perché quell\'incarico della Soprintendenza spettava al mio studio per anzianità di curriculum.\n' +
+          'Ma da una lite professionale a un furto o a una scomparsa ce ne passa! La sera del 18 sono rientrata presto nel mio affittacamere alla Locanda del Borgo perché pioveva a dirotto, come vi ha confermato anche il gestore. Eleonora era ambiziosa e riservatissima: negli ultimi due giorni teneva sempre chiusa la porta della foresteria e non faceva avvicinare nessuno ai suoi rilievi chimici.»'
+      },
+      {
+        id: 'tape_5',
+        code: 'NASTRO 05/96 — REPERTO FONOGRAFICO E',
+        witness: 'Edoardo Valli',
+        role: 'Antiquario e perito estimatore d\'arte sacra',
+        recordedAt: '21/09/1996 — Ore 16:15',
+        durationSec: 40,
+        gender: 'male',
+        pitch: 0.80,
+        rate: 0.94,
+        spokenText:
+          'Verbale audio del 21 settembre 1996, ore 16 e 15. Dichiarante Edoardo Valli. ' +
+          'Sono stato io a scoprire la teca vuota nella sacrestia alle otto del mattino del 19 settembre, mentre ero alla villa per aggiornare l\'inventario assicurativo insieme all\'Avvocato Moretti. ' +
+          'Il Reliquiario di San Lorenzo è un pezzo unico del Cinquecento da quattrocento milioni di Lire, ma è talmente noto nei cataloghi internazionali che nessun ricettatore serio lo toccherebbe mai: solo una dilettante alle strette coi soldi poteva pensare di rubarlo. ' +
+          'La sera prima ho chiuso la mia bottega alle otto e sono andato a dormire. Perché ero vicino alla biblioteca due giorni fa? Cercavo solo vecchie fatture dei restauri degli anni Cinquanta per completare la scheda storica.',
+        transcript:
+          '[INIZIO REGISTRAZIONE — CASERMA CC CASTELVECCHIO, 21/09/1996 ORE 16:15]\n' +
+          'MAR. DE SANTIS: «Audizione del Sig. Edoardo Valli, nato il 09/01/1951, antiquario.»\n\n' +
+          'EDOARDO VALLI: «Sono stato io a scoprire la teca vuota nella sacrestia alle otto del mattino del 19 settembre, mentre ero alla villa per aggiornare l\'inventario assicurativo insieme all\'Avvocato Moretti.\n' +
+          'Il Reliquiario di San Lorenzo è un pezzo unico del Cinquecento da quattrocento milioni di Lire, ma è talmente noto nei cataloghi internazionali che nessun ricettatore serio lo toccherebbe mai: solo una dilettante alle strette coi soldi poteva pensare di rubarlo. La sera prima ho chiuso la mia bottega alle otto e sono andato a dormire. Perché ero vicino alla biblioteca due giorni fa? Cercavo solo vecchie fatture dei restauri degli anni Cinquanta per completare la scheda storica.»'
+      },
+      {
+        id: 'tape_6',
+        code: 'NASTRO 06/96 — REPERTO FONOGRAFICO F',
+        witness: 'Avv. Gianluca Moretti',
+        role: 'Segretario Generale e Tesoriere Fondazione Villa Valenti',
+        recordedAt: '22/09/1996 — Ore 11:45',
+        durationSec: 38,
+        gender: 'male',
+        pitch: 0.94,
+        rate: 1.02,
+        spokenText:
+          'Verbale audio del 22 settembre 1996, ore 11 e 45. Dichiarante Avvocato Gianluca Moretti. ' +
+          'Come tesoriere della Fondazione Culturale Villa Valenti confermo che tutti gli atti relativi ai contributi statali per la Cappella Gentilizia sono perfettamente in regola. ' +
+          'La sera del 18 settembre mi trovavo a Milano per una cena di lavoro con due colleghi dello studio associato, che hanno già rilasciato dichiarazione scritta. ' +
+          'Riteniamo che la Dottoressa Marchetti abbia agito da sola, approfittando delle chiavi interne di servizio affidatele per il cantiere, e chiediamo che la Fondazione venga riconosciuta parte lesa nel procedimento.',
+        transcript:
+          '[INIZIO REGISTRAZIONE — CASERMA CC CASTELVECCHIO, 22/09/1996 ORE 11:45]\n' +
+          'MAR. DE SANTIS: «Audizione dell\'Avv. Gianluca Moretti, nato il 15/06/1960, legale della Fondazione.»\n\n' +
+          'AVV. GIANLUCA MORETTI: «Come tesoriere della Fondazione Culturale Villa Valenti confermo che tutti gli atti relativi ai contributi statali per la Cappella Gentilizia sono perfettamente in regola.\n' +
+          'La sera del 18 settembre mi trovavo a Milano per una cena di lavoro con due colleghi dello studio associato, che hanno già rilasciato dichiarazione scritta. Riteniamo che la Dottoressa Marchetti abbia agito da sola, approfittando delle chiavi interne di servizio affidatele per il cantiere, e chiediamo che la Fondazione venga riconosciuta parte lesa nel procedimento.»'
+      }
+    ];
+
+    /* =========================================================================
+       3. GESTIONE LOGIN & SESSIONE ARCHIVIO
+       ========================================================================= */
+    const SESSION_AUTH_KEY = 'solvethiscase_arma_auth_v1';
+    const VALID_MATRICOLA = 'FDESANTIS-96';
+    const VALID_CODE = 'CHIANTI1996';
+
+    function handleLoginSubmit(event) {
+      event.preventDefault();
+      const matInput = document.getElementById('input-matricola').value.trim().toUpperCase();
+      const pwdInput = document.getElementById('input-password').value.trim().toUpperCase();
+      const errorBox = document.getElementById('login-error-box');
+
+      if (matInput === VALID_MATRICOLA && pwdInput === VALID_CODE) {
+        errorBox.classList.remove('visible');
+        try {
+          sessionStorage.setItem(SESSION_AUTH_KEY, '1');
+        } catch (e) {}
+        unlockArchiveView();
+      } else {
+        errorBox.classList.add('visible');
+      }
+    }
+
+    function unlockArchiveView() {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('archive-dashboard').classList.add('active');
+      document.getElementById('terminal-status-label').textContent =
+        'SESSIONE AUTORIZZATA: MAR. CAPO F. DE SANTIS [FDESANTIS-96]';
+      renderTapesList();
+    }
+
+    function handleLogout() {
+      stopAllPlayback();
+      try {
+        sessionStorage.removeItem(SESSION_AUTH_KEY);
+      } catch (e) {}
+      document.getElementById('input-password').value = '';
+      document.getElementById('archive-dashboard').classList.remove('active');
+      document.getElementById('login-section').classList.remove('hidden');
+      document.getElementById('terminal-status-label').textContent =
+        'TERMINALE ARCHIVIO ATTIVO — IN ATTESA AUTENTICAZIONE';
+    }
+
+    /* =========================================================================
+       4. RENDERING SCHEDE NASTRO & CONTROLLO RIPRODUZIONE
+       ========================================================================= */
+    let activeTapeId = null;
+    let progressInterval = null;
+    let elapsedSec = 0;
+
+    function formatMMSS(sec) {
+      const s = Math.max(0, Math.floor(sec));
+      const mins = String(Math.floor(s / 60)).padStart(2, '0');
+      const secs = String(s % 60).padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    function renderTapesList() {
+      const container = document.getElementById('tapes-container');
+      container.innerHTML = DEPOSITION_TAPES.map(tape => `
+        <article id="card-${tape.id}" class="tape-card">
+          <div class="tape-top">
+            <div>
+              <div class="tape-code">${escapeHtml(tape.code)}</div>
+              <h3 class="tape-witness">${escapeHtml(tape.witness)}</h3>
+              <div class="tape-role">${escapeHtml(tape.role)}</div>
+            </div>
+            <div class="tape-date-badge">${escapeHtml(tape.recordedAt)}</div>
+          </div>
+
+          <div class="tape-deck">
+            <button id="playbtn-${tape.id}" type="button" class="tape-play-btn" onclick="toggleTapePlayback('${tape.id}')">
+              ▶ Ascolta Nastro
+            </button>
+
+            <div class="reel-pair" aria-hidden="true">
+              <span class="reel-wheel"></span>
+              <span class="reel-wheel"></span>
+            </div>
+
+            <div class="tape-progress-wrap">
+              <div class="tape-progress-track">
+                <div id="bar-${tape.id}" class="tape-progress-fill"></div>
+              </div>
+              <div class="tape-time-row">
+                <span id="elapsed-${tape.id}">00:00</span>
+                <span>${formatMMSS(tape.durationSec)}</span>
+              </div>
+            </div>
+
+            <button id="trbtn-${tape.id}" type="button" class="tape-transcript-btn" onclick="toggleTranscript('${tape.id}')">
+              📄 Trascrizione
+            </button>
+          </div>
+
+          <div id="transcript-${tape.id}" class="transcript-box">
+            <div class="transcript-box-head">Trascrizione Integrale Verbale Fonografico — ${escapeHtml(tape.witness)}</div>
+            <div class="transcript-box-body">${escapeHtml(tape.transcript)}</div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    async function toggleTapePlayback(tapeId) {
+      if (activeTapeId === tapeId) {
+        stopAllPlayback();
+        return;
+      }
+
+      stopAllPlayback();
+
+      const tape = DEPOSITION_TAPES.find(t => t.id === tapeId);
+      if (!tape) return;
+
+      activeTapeId = tapeId;
+      elapsedSec = 0;
+
+      const card = document.getElementById(`card-${tapeId}`);
+      const btn = document.getElementById(`playbtn-${tapeId}`);
+      const statusEl = document.getElementById('global-player-status');
+
+      card.classList.add('playing');
+      btn.textContent = '■ Ferma Nastro';
+      statusEl.textContent = `Riproduzione in corso: ${tape.witness} (${tape.code})`;
+
+      // Avvia effetto meccanico nastro magnetico
+      await tapeAudio.playTapeEngageEffect();
+      if (activeTapeId !== tapeId) return;
+
+      // Avvia timer barra di avanzamento
+      progressInterval = setInterval(() => {
+        if (activeTapeId !== tapeId) return;
+        elapsedSec += 0.25;
+        const pct = Math.min(100, (elapsedSec / tape.durationSec) * 100);
+        const barEl = document.getElementById(`bar-${tapeId}`);
+        const elapEl = document.getElementById(`elapsed-${tapeId}`);
+        if (barEl) barEl.style.width = `${pct}%`;
+        if (elapEl) elapEl.textContent = formatMMSS(Math.min(elapsedSec, tape.durationSec));
+
+        if (elapsedSec >= tape.durationSec && !('speechSynthesis' in window && window.speechSynthesis.speaking)) {
+          stopAllPlayback();
+        }
+      }, 250);
+
+      // Avvia sintesi vocale in italiano
+      tapeAudio.speakTape(tape, () => {
+        if (activeTapeId === tapeId) {
+          stopAllPlayback();
+        }
+      });
+    }
+
+    function stopAllPlayback() {
+      tapeAudio.stopVoice();
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
+
+      if (activeTapeId) {
+        const prevCard = document.getElementById(`card-${activeTapeId}`);
+        const prevBtn = document.getElementById(`playbtn-${activeTapeId}`);
+        const prevBar = document.getElementById(`bar-${activeTapeId}`);
+        const prevElap = document.getElementById(`elapsed-${activeTapeId}`);
+
+        if (prevCard) prevCard.classList.remove('playing');
+        if (prevBtn) prevBtn.textContent = '▶ Ascolta Nastro';
+        if (prevBar) prevBar.style.width = '0%';
+        if (prevElap) prevElap.textContent = '00:00';
+      }
+
+      activeTapeId = null;
+      elapsedSec = 0;
+      const statusEl = document.getElementById('global-player-status');
+      if (statusEl) statusEl.textContent = 'Nessun nastro in ascolto';
+    }
+
+    function toggleTranscript(tapeId) {
+      const box = document.getElementById(`transcript-${tapeId}`);
+      const btn = document.getElementById(`trbtn-${tapeId}`);
+      if (!box || !btn) return;
+      const isOpen = box.classList.toggle('open');
+      btn.textContent = isOpen ? '✕ Chiudi Testo' : '📄 Trascrizione';
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        if (sessionStorage.getItem(SESSION_AUTH_KEY) === '1') {
+          unlockArchiveView();
+        }
+      } catch (e) {}
+    });
+  </script>
+</body>
+</html>
