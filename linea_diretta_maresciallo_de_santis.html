@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Maresciallo Franco De Santis — WhatsApp</title>
+  <style>
+    /* =========================================================================
+       1. DESIGN TOKENS — TEMA SCURO AUTENTICO WHATSAPP MOBILE
+       ========================================================================= */
+    :root {
+      --wa-bg-deep: #0b141a;
+      --wa-chrome: #202c33;
+      --wa-chrome-elevated: #233138;
+      --wa-input-bg: #2a3942;
+      --wa-bubble-out: #005c4b;
+      --wa-bubble-in: #202c33;
+      --wa-accent: #00a884;
+      --wa-accent-bright: #25d366;
+      --wa-tick-blue: #53bdeb;
+      --wa-text-primary: #e9edef;
+      --wa-text-secondary: #8696a0;
+      --wa-border: rgba(134, 150, 160, 0.16);
+      --wa-danger: #f15c6d;
+      --shadow-bubble: 0 1px 1.5px rgba(0, 0, 0, 0.34);
+      --shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: #060b0e;
+      color: var(--wa-text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Contenitore mobile-first centrato su desktop */
+    .wa-app {
+      width: 100%;
+      max-width: 480px;
+      height: 100dvh;
+      background-color: var(--wa-bg-deep);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 520px) {
+      .wa-app {
+        height: 95dvh;
+        max-height: 880px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    /* =========================================================================
+       2. TOP BAR WHATSAPP (SOLO FRECCIA, AVATAR FD, NOME, CORNETTA E 3 PUNTINI)
+       ========================================================================= */
+    .wa-topbar {
+      height: 62px;
+      background-color: var(--wa-chrome);
+      padding: 0 6px 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      flex-shrink: 0;
+      z-index: 20;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+
+    .wa-left-cluster {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .wa-back-btn {
+      background: transparent;
+      border: none;
+      color: var(--wa-text-primary);
+      width: 36px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .wa-back-btn:active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .wa-avatar-wrap {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      margin-right: 10px;
+    }
+
+    .wa-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1f3a44 0%, #12262e 100%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #d9fdd3;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .wa-online-dot {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background-color: var(--wa-accent-bright);
+      border: 2px solid var(--wa-chrome);
+    }
+
+    .wa-contact-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .wa-contact-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--wa-text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+
+    .wa-contact-status {
+      font-size: 12.5px;
+      color: var(--wa-text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .wa-contact-status.typing {
+      color: var(--wa-accent-bright);
+      font-weight: 500;
+    }
+
+    .wa-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .wa-icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--wa-text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .wa-icon-btn:hover,
+    .wa-icon-btn:active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Menu a tre puntini */
+    .wa-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 6px;
+      width: 252px;
+      background-color: var(--wa-chrome-elevated);
+      border-radius: 12px;
+      padding: 6px 0;
+      box-shadow: var(--shadow-menu);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 50;
+      transform-origin: top right;
+      animation: menuPop 0.14s ease-out;
+    }
+
+    @keyframes menuPop {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .wa-dropdown-item {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 13px 16px;
+      color: var(--wa-text-primary);
+      font-size: 14.5px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .wa-dropdown-item:hover,
+    .wa-dropdown-item:active {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .wa-dropdown-item.danger {
+      color: var(--wa-danger);
+    }
+
+    .wa-doc-counter {
+      background: var(--wa-accent);
+      color: #0b141a;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    /* =========================================================================
+       3. SFONDO DOODLE WHATSAPP & FLUSSO MESSAGGI
+       ========================================================================= */
+    .wa-chat-canvas {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--wa-bg-deep);
+      background-image: url("data:image/svg+xml,%3Csvg width='160' height='160' viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23e9edef' stroke-width='1.1' opacity='0.045'%3E%3Ccircle cx='28' cy='28' r='10'/%3E%3Cline x1='35' y1='35' x2='44' y2='44'/%3E%3Crect x='98' y='20' width='28' height='19' rx='3'/%3E%3Cpolyline points='98,22 112,32 126,22'/%3E%3Ccircle cx='118' cy='112' r='11'/%3E%3Cpolyline points='118,105 118,112 123,115'/%3E%3Cpath d='M24 126 L38 112 L44 118 L30 132 Z'/%3E%3Cpath d='M72 68 Q80 58 88 68 T104 68'/%3E%3Crect x='22' y='72' width='18' height='22' rx='2'/%3E%3Cline x1='26' y1='78' x2='36' y2='78'/%3E%3Cline x1='26' y1='83' x2='34' y2='83'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .wa-messages-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+
+    .wa-messages-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .wa-messages-scroll::-webkit-scrollbar-thumb {
+      background: rgba(134, 150, 160, 0.25);
+      border-radius: 99px;
+    }
+
+    /* Pillola crittografia / data stile WhatsApp */
+    .wa-system-pill {
+      align-self: center;
+      background-color: #182229;
+      color: #ffd279;
+      font-size: 11.5px;
+      line-height: 1.4;
+      text-align: center;
+      padding: 7px 13px;
+      border-radius: 9px;
+      max-width: 92%;
+      margin: 2px 0 6px;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+    }
+
+    .wa-day-pill {
+      align-self: center;
+      background-color: #182229;
+      color: var(--wa-text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 5px 11px;
+      border-radius: 8px;
+      margin: 2px 0;
+    }
+
+    /* Righe e fumetti messaggio */
+    .wa-msg-row {
+      display: flex;
+      width: 100%;
+    }
+
+    .wa-msg-row.in {
+      justify-content: flex-start;
+    }
+
+    .wa-msg-row.out {
+      justify-content: flex-end;
+    }
+
+    .wa-bubble {
+      max-width: 84%;
+      padding: 8px 11px 6px;
+      font-size: 14.5px;
+      line-height: 1.42;
+      position: relative;
+      box-shadow: var(--shadow-bubble);
+      word-wrap: break-word;
+    }
+
+    .wa-bubble.in {
+      background-color: var(--wa-bubble-in);
+      color: var(--wa-text-primary);
+      border-radius: 0 11px 11px 11px;
+    }
+
+    .wa-bubble.in::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -8px;
+      border-top: 10px solid var(--wa-bubble-in);
+      border-left: 8px solid transparent;
+    }
+
+    .wa-bubble.out {
+      background-color: var(--wa-bubble-out);
+      color: var(--wa-text-primary);
+      border-radius: 11px 0 11px 11px;
+    }
+
+    .wa-bubble.out::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -8px;
+      border-top: 10px solid var(--wa-bubble-out);
+      border-right: 8px solid transparent;
+    }
+
+    .wa-msg-text {
+      white-space: pre-wrap;
+    }
+
+    /* Scheda Allegato Ufficiale PDF-style dentro la bolla */
+    .wa-evidence-card {
+      background-color: rgba(11, 20, 26, 0.52);
+      border-left: 4px solid var(--wa-accent);
+      border-radius: 8px;
+      padding: 10px 11px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .wa-evidence-card:active {
+      background-color: rgba(11, 20, 26, 0.78);
+    }
+
+    .wa-ev-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .wa-pdf-badge {
+      background-color: #d9383a;
+      color: #ffffff;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.4px;
+      flex-shrink: 0;
+    }
+
+    .wa-ev-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #7fe7d1;
+      line-height: 1.3;
+    }
+
+    .wa-ev-body {
+      font-size: 12.5px;
+      color: #d1d7db;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 6px;
+    }
+
+    .wa-ev-tap-hint {
+      font-size: 11px;
+      color: var(--wa-accent-bright);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    /* Scheda Chiusura Caso */
+    .wa-solved-banner {
+      margin-top: 8px;
+      background: rgba(0, 168, 132, 0.16);
+      border: 1px solid rgba(37, 211, 102, 0.45);
+      border-radius: 9px;
+      padding: 10px 11px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: #d9fdd3;
+    }
+
+    .wa-solved-banner strong {
+      display: block;
+      color: var(--wa-accent-bright);
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    /* Orario e spunte blu */
+    .wa-msg-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 3px;
+      font-size: 11px;
+      color: rgba(233, 237, 239, 0.6);
+    }
+
+    /* =========================================================================
+       4. SUGGERIMENTI RAPIDI & BARRA DI INPUT WHATSAPP
+       ========================================================================= */
+    .wa-chips-strip {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 6px 12px 4px;
+      flex-shrink: 0;
+      scrollbar-width: none;
+    }
+
+    .wa-chips-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .wa-chip {
+      background-color: var(--wa-chrome);
+      color: #d1d7db;
+      border: 1px solid rgba(134, 150, 160, 0.25);
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-size: 12.5px;
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+    }
+
+    .wa-chip:active {
+      background-color: var(--wa-input-bg);
+    }
+
+    .wa-chip.accuse {
+      background-color: rgba(0, 168, 132, 0.2);
+      border-color: var(--wa-accent);
+      color: #7fe7d1;
+      font-weight: 600;
+    }
+
+    .wa-composer {
+      padding: 7px 10px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .wa-input-box {
+      flex: 1;
+      background-color: var(--wa-chrome);
+      border-radius: 24px;
+      padding: 11px 16px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    }
+
+    .wa-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--wa-text-primary);
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .wa-input::placeholder {
+      color: var(--wa-text-secondary);
+    }
+
+    .wa-send-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--wa-accent);
+      color: #0b141a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      transition: transform 0.1s ease, background 0.15s ease;
+    }
+
+    .wa-send-btn:active {
+      transform: scale(0.94);
+      background-color: var(--wa-accent-bright);
+    }
+
+    /* =========================================================================
+       5. OVERLAY CHIAMATA VOCALE WHATSAPP (ATTIVATO DALLA CORNETTA IN ALTO)
+       ========================================================================= */
+    .wa-call-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 22%, #163338 0%, #0b141a 68%);
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 26px 20px 28px;
+    }
+
+    .wa-call-overlay.open {
+      display: flex;
+      animation: fadeCallIn 0.2s ease-out;
+    }
+
+    @keyframes fadeCallIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .call-header-meta {
+      text-align: center;
+    }
+
+    .call-e2e {
+      font-size: 11.5px;
+      color: var(--wa-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .call-name {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--wa-text-primary);
+      margin-top: 12px;
+    }
+
+    .call-timer {
+      font-size: 15px;
+      color: var(--wa-text-secondary);
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .call-timer.connected {
+      color: var(--wa-accent-bright);
+      font-weight: 600;
+    }
+
+    .call-mid-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin: auto 0;
+    }
+
+    .call-avatar-large {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1f3a44 0%, #12262e 100%);
+      border: 2px solid rgba(37, 211, 102, 0.4);
+      color: #d9fdd3;
+      font-size: 36px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .call-avatar-large.ringing {
+      animation: waPulse 1.6s infinite;
+    }
+
+    @keyframes waPulse {
+      0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); transform: scale(0.98); }
+      70% { box-shadow: 0 0 0 24px rgba(37, 211, 102, 0); transform: scale(1.02); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); transform: scale(0.98); }
+    }
+
+    .call-subtitles-card {
+      width: 100%;
+      max-height: 140px;
+      overflow-y: auto;
+      background: rgba(32, 44, 51, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      line-height: 1.48;
+      color: var(--wa-text-primary);
+      text-align: center;
+    }
+
+    .call-questions-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .call-q-btn {
+      width: 100%;
+      background-color: rgba(32, 44, 51, 0.92);
+      border: 1px solid rgba(0, 168, 132, 0.35);
+      color: var(--wa-text-primary);
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .call-q-btn:active {
+      background-color: rgba(0, 168, 132, 0.25);
+    }
+
+    .call-bottom-dock {
+      background-color: var(--wa-chrome);
+      border-radius: 28px;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    .call-dock-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--wa-text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .call-dock-btn.active-state {
+      background-color: #ffffff;
+      color: #0b141a;
+    }
+
+    .call-dock-btn.hangup {
+      width: 58px;
+      height: 58px;
+      background-color: #ea0038;
+      color: #ffffff;
+    }
+
+    /* =========================================================================
+       6. MODALI SCURE (FASCICOLO DOCUMENTI, DETTAGLIO PROVA, CONFERMA RESET)
+       ========================================================================= */
+    .wa-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .wa-modal-backdrop.open {
+      display: flex;
+    }
+
+    .wa-modal-panel {
+      width: 100%;
+      max-height: 82dvh;
+      background-color: var(--wa-chrome-elevated);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+    }
+
+    .wa-modal-head {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--wa-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .wa-modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--wa-text-primary);
+    }
+
+    .wa-modal-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dossier-card {
+      background-color: var(--wa-bg-deep);
+      border-left: 4px solid var(--wa-accent);
+      border-radius: 10px;
+      padding: 11px 12px;
+    }
+
+    .dossier-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #7fe7d1;
+      margin-bottom: 5px;
+    }
+
+    .dossier-card-text {
+      font-size: 12.5px;
+      color: #d1d7db;
+      line-height: 1.48;
+      white-space: pre-wrap;
+    }
+
+    .wa-modal-foot {
+      padding: 12px 16px;
+      border-top: 1px solid var(--wa-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .wa-btn-flat {
+      background: transparent;
+      border: 1px solid rgba(134, 150, 160, 0.35);
+      color: var(--wa-text-primary);
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .wa-btn-accent {
+      background: var(--wa-accent);
+      border: none;
+      color: #0b141a;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .wa-btn-danger {
+      background: var(--wa-danger);
+      border: none;
+      color: #ffffff;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="wa-app">
+
+    <!-- ==================== HEADER WHATSAPP PURO ==================== -->
+    <header class="wa-topbar">
+      <div class="wa-left-cluster">
+        <button type="button" class="wa-back-btn" onclick="scrollChatToBottom()" aria-label="Torna in fondo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+          </svg>
+        </button>
+
+        <div class="wa-avatar-wrap">
+          <div class="wa-avatar">FD</div>
+          <span class="wa-online-dot" aria-hidden="true"></span>
+        </div>
+
+        <div class="wa-contact-info">
+          <div class="wa-contact-name">Maresciallo Franco De Santis</div>
+          <div id="wa-status-text" class="wa-contact-status">online</div>
+        </div>
+      </div>
+
+      <div class="wa-right-actions">
+        <!-- Cornetta Chiamata Vocale WhatsApp -->
+        <button type="button" class="wa-icon-btn" onclick="openWhatsAppCall()" aria-label="Chiama Maresciallo Franco De Santis" title="Chiama">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
+          </svg>
+        </button>
+
+        <!-- Menu 3 puntini -->
+        <button type="button" class="wa-icon-btn" onclick="toggleDropdownMenu()" aria-label="Altre opzioni" title="Menu">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+        </button>
+
+        <div id="wa-menu-dropdown" class="wa-dropdown hidden" role="menu">
+          <button type="button" class="wa-dropdown-item" onclick="openDossierModal(); toggleDropdownMenu();">
+            <span>Fascicolo Documenti Sbloccati</span>
+            <span id="dossier-count-pill" class="wa-doc-counter">0/4</span>
+          </button>
+          <button type="button" class="wa-dropdown-item danger" onclick="openResetModal(); toggleDropdownMenu();">
+            <span>Azzera Chat</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================== AREA MESSAGGI WHATSAPP ==================== -->
+    <section class="wa-chat-canvas">
+      <div id="wa-messages-list" class="wa-messages-scroll"></div>
+
+      <!-- Suggerimenti rapidi contestuali -->
+      <div id="wa-quick-chips" class="wa-chips-strip"></div>
+
+      <!-- Barra composizione messaggio -->
+      <form class="wa-composer" onsubmit="handleUserMessageSubmit(event)">
+        <div class="wa-input-box">
+          <input
+            id="wa-message-input"
+            type="text"
+            class="wa-input"
+            autocomplete="off"
+            placeholder="Messaggio"
+          />
+        </div>
+        <button type="submit" class="wa-send-btn" aria-label="Invia">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" style="transform: translateX(1px);">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- ==================== OVERLAY CHIAMATA VOCALE WHATSAPP ==================== -->
+    <div id="wa-call-overlay" class="wa-call-overlay" role="dialog" aria-modal="true">
+      <div class="call-header-meta">
+        <div class="call-e2e">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+          </svg>
+          <span>Crittografata end-to-end</span>
+        </div>
+        <div class="call-name">Maresciallo Franco De Santis</div>
+        <div id="wa-call-timer" class="call-timer">Sta squillando...</div>
+      </div>
+
+      <div class="call-mid-section">
+        <div id="wa-call-avatar" class="call-avatar-large ringing">FD</div>
+
+        <div class="call-subtitles-card">
+          <p id="wa-call-subtitle">Inoltro chiamata sul cellulare personale del Maresciallo...</p>
+        </div>
+
+        <!-- 4 Domande vocali rapide durante la chiamata -->
+        <div id="wa-call-questions" class="call-questions-list hidden">
+          <button type="button" class="call-q-btn" onclick="askVoiceQuestion('fuga')">
+            <span>1. Controlli sugli espatri e conti 1996</span>
+            <span>🎙️</span>
+          </button>
+          <button type="button" class="call-q-btn" onclick="askVoiceQuestion('strada')">
+            <span>2. Regolamento Strada Consortile</span>
+            <span>🎙️</span>
+          </button>
+          <button type="button" class="call-q-btn" onclick="askVoiceQuestion('treni')">
+            <span>3. Orari treni FS 18 settembre 1996</span>
+            <span>🎙️</span>
+          </button>
+          <button type="button" class="call-q-btn" onclick="askVoiceQuestion('lavori')">
+            <span>4. Chi ha cercato di fermare i lavori nel 2026?</span>
+            <span>🎙️</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="call-bottom-dock">
+        <button id="call-speaker-btn" type="button" class="call-dock-btn active-state" onclick="toggleCallSpeaker()" aria-label="Vivavoce" title="Vivavoce">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+        </button>
+
+        <button id="call-mute-btn" type="button" class="call-dock-btn" onclick="toggleCallMute()" aria-label="Disattiva microfono" title="Muto">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
+          </svg>
+        </button>
+
+        <button type="button" class="call-dock-btn hangup" onclick="closeWhatsAppCall()" aria-label="Termina chiamata" title="Chiudi chiamata">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="transform: rotate(135deg);">
+            <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== MODALE FASCICOLO DOCUMENTI SBLOCCATI ==================== -->
+    <div id="wa-dossier-modal" class="wa-modal-backdrop" role="dialog" aria-modal="true">
+      <div class="wa-modal-panel">
+        <div class="wa-modal-head">
+          <div class="wa-modal-title">Fascicolo Documenti Sbloccati</div>
+          <button type="button" class="wa-icon-btn" onclick="closeDossierModal()" aria-label="Chiudi">✕</button>
+        </div>
+        <div id="wa-dossier-list" class="wa-modal-body"></div>
+        <div class="wa-modal-foot">
+          <button type="button" class="wa-btn-accent" onclick="closeDossierModal()">Chiudi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODALE CONFERMA AZZERA CHAT ==================== -->
+    <div id="wa-reset-modal" class="wa-modal-backdrop" role="dialog" aria-modal="true">
+      <div class="wa-modal-panel" style="max-width: 340px;">
+        <div class="wa-modal-head">
+          <div class="wa-modal-title">Azzerare questa chat?</div>
+        </div>
+        <div class="wa-modal-body">
+          <p style="font-size: 13.5px; color: #d1d7db; line-height: 1.45;">
+            Verranno eliminati i messaggi inviati e i documenti sbloccati per ricominciare l'indagine dall'inizio.
+          </p>
+        </div>
+        <div class="wa-modal-foot">
+          <button type="button" class="wa-btn-flat" onclick="closeResetModal()">Annulla</button>
+          <button type="button" class="wa-btn-danger" onclick="confirmResetChat()">Azzera Chat</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* =========================================================================
+       1. MOTORE AUDIO & SINTESI VOCALE (WEB AUDIO API + WEB SPEECH API)
+       ========================================================================= */
+    class WhatsAppAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.ringInterval = null;
+        this.speakerEnabled = true;
+      }
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+      }
+
+      // Suono notifica messaggio WhatsApp in arrivo
+      playIncomingPop() {
+        try {
+          this.initContext();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(580, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.075);
+          gain.gain.setValueAtTime(0.055, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.09);
+        } catch (e) {}
+      }
+
+      // Squillo telefonico italiano (425 Hz)
+      startRinging() {
+        this.stopRinging();
+        const pulse = () => {
+          try {
+            this.initContext();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(425, now);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.setValueAtTime(0.06, now + 0.72);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.78);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.78);
+          } catch (e) {}
+        };
+        pulse();
+        this.ringInterval = setInterval(pulse, 1750);
+      }
+
+      stopRinging() {
+        if (this.ringInterval) {
+          clearInterval(this.ringInterval);
+          this.ringInterval = null;
+        }
+      }
+
+      // Sintesi vocale del Maresciallo Franco De Santis
+      speak(text) {
+        this.stopSpeech();
+        if (!this.speakerEnabled || !('speechSynthesis' in window)) return;
+        try {
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'it-IT';
+          utter.pitch = 0.88;
+          utter.rate = 0.96;
+          const voices = window.speechSynthesis.getVoices();
+          const itVoice = voices.find(v => v.lang && v.lang.toLowerCase().includes('it'));
+          if (itVoice) utter.voice = itVoice;
+          window.speechSynthesis.speak(utter);
+        } catch (e) {}
+      }
+
+      stopSpeech() {
+        try {
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+          }
+        } catch (e) {}
+      }
+    }
+
+    const audioEngine = new WhatsAppAudioEngine();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    /* =========================================================================
+       2. DATABASE SCHEDE PROVA UFFICIALI (4 ALLEGATI SBLOCCABILI)
+       ========================================================================= */
+    const EVIDENCE_CARDS = {
+      card1: {
+        id: 'card1',
+        title: 'Nota Riservata Questura - Verifica Espatri e Movimenti Bancari 1996',
+        body: 'QUESTURA DI FIRENZE — Ufficio Frontiere & Accertamenti Patrimoniali\nSoggetto: MARCHETTI Eleonora (nata il 14/03/1969)\n• Esito controllo passaporti e valichi di frontiera (dal 18/09/1996): NEGATIVO. Nessun espatrio registrato né emissione di documenti sostitutivi.\n• Accertamento bancario: conto corrente bloccato su saldo residuo di Lire 184.000; nessuna operazione effettuata dopo il 16/09/1996.\n• Banca Dati Opere d\'Arte Trafugate: nessuna traccia del Reliquiario di San Lorenzo sul mercato antiquario.'
+      },
+      card2: {
+        id: 'card2',
+        title: 'Consorzio Stradale Vicinale Il Poggio (Prot. 12/94)',
+        body: 'CONSORZIO STRADALE VICINALE "IL POGGIO" — Castelvecchio in Chianti\n• Art. 1: La Strada Consortile del Poggio (4,5 km, percorrenza ~7 min) è riservata ai proprietari e al personale residente.\n• Art. 2: La sbarra automatizzata al km 0,4 resta chiusa e bloccata ogni notte dalle ore 22:00 alle ore 06:00.\n• Telecomandi assegnati esclusivamente a: Contessa Beatrice Valenti (proprietaria) e Marco Rinaldi (custode residente). I consulenti esterni (Eleonora) dopo le 22:00 erano obbligati a percorrere la SP 42 delle Colline (21 km, circa 26 minuti).'
+      },
+      card3: {
+        id: 'card3',
+        title: 'Estratto Orario Ufficiale FS - 18 Settembre 1996',
+        body: 'FERROVIE DELLO STATO — Compartimento di Firenze (Orario Estivo/Autunnale 1996)\nTratta: Firenze Santa Maria Novella ↔ Castelvecchio in Chianti\n• Ultimo treno in partenza da Castelvecchio (direzione Firenze/Roma): ore 23:15.\n• Ultimo treno regionale in partenza da Firenze S.M.N. per Castelvecchio: partenza ore 21:32 — arrivo a Castelvecchio alle ore 22:25.\n(Nota: la Trattoria Da Ivo dista circa 4 minuti a piedi dal binario 1 di Firenze S.M.N.).'
+      },
+      card4: {
+        id: 'card4',
+        title: 'Lettera Riservata Prot. 18/2026 (12 Luglio 2026)',
+        body: 'FONDAZIONE CULTURALE VILLA VALENTI — Ufficio della Presidenza\nProt. Riservato n. 18/2026 del 12 Luglio 2026\nDa: Prof. Lorenzo Bellini (Presidente) — A: Contessa Beatrice Valenti\n«Cara Beatrice, ti chiedo nuovamente di sospendere con urgenza le demolizioni dei tramezzi nella Foresteria e i lavori murari nella Cripta della Cappella. Ho contattato anche il Dott. Salvi al Ministero della Cultura per valutare uno stop cautelativo, sostenendo che le vibrazioni danneggerebbero l\'affresco di San Lorenzo...»'
+      }
+    };
+
+    /* =========================================================================
+       3. REGOLE DI RISPOSTA DEL MARESCIALLO FRANCO DE SANTIS (10 SCENARI)
+       ========================================================================= */
+    const KNOWLEDGE_RULES = [
+      {
+        id: 'rule_fuga',
+        cardId: 'card1',
+        chipLabel: 'Verifica espatri e conti 1996',
+        chipMessage: 'Maresciallo, nella borsa c\'erano portafoglio, documenti e la fede della madre: non è scappata! Può verificare frontiere e conti bancari del 1996?',
+        keywords: ['fuga', 'estero', 'scappata', 'soldi', 'portafoglio', 'fede', 'anello', 'documenti', 'frontiere', 'conto'],
+        reply: 'Lo sapevo fin dal settembre 1996! Nessuna ladra mura i propri documenti e la fede della madre dentro una parete. Ho appena sentito un mio ex collega in Questura e mi ha girato questa nota riservata: Eleonora non ha mai varcato una frontiera né toccato un centesimo.',
+        voiceReply: 'Lo sapevo fin dal 1996! Ho fatto controllare gli archivi della Questura: Eleonora non ha mai varcato una frontiera, non ha mai toccato il suo conto bancario e il reliquiario non è mai emerso sul mercato nero. Non è mai fuggita.'
+      },
+      {
+        id: 'rule_strada',
+        cardId: 'card2',
+        chipLabel: 'Regolamento strada e sbarra',
+        chipMessage: 'Può controllare il regolamento della Strada Consortile del Poggio e chi aveva il telecomando della sbarra?',
+        keywords: ['sbarra', 'strada', 'consortile', 'poggio', 'telecomando', 'scorciatoia', '22', 'mappa'],
+        reply: 'Ho recuperato negli archivi comunali il regolamento ufficiale del Consorzio Stradale del Poggio. Guardate l\'orario di chiusura della sbarra e chi aveva il telecomando: fatevi subito il calcolo dei minuti sulla mappa!',
+        voiceReply: 'Ho recuperato il regolamento del Consorzio Stradale Il Poggio: la sbarra automatica scende ogni notte alle 22:00 fino alle 6 del mattino. Solo la Contessa e il custode Marco Rinaldi avevano il telecomando; Eleonora era obbligata a fare i 21 chilometri della SP 42.'
+      },
+      {
+        id: 'rule_treni',
+        cardId: 'card3',
+        chipLabel: 'Orari treni FS 18/09/1996',
+        chipMessage: 'Maresciallo, può recuperare gli orari dei treni FS del 18 settembre 1996 tra Firenze e Castelvecchio?',
+        keywords: ['treno', 'treni', 'orari', 'fs', 'firenze', 'stazione', '21:32', '23:15'],
+        reply: 'Ho fatto tirare fuori dall\'archivio ferroviario l\'orario ufficiale FS del 18 settembre 1996. Guardate bene l\'ultimo treno da Castelvecchio e il regionale della sera da Firenze Santa Maria Novella:',
+        voiceReply: 'Ho trovato l\'orario ferroviario ufficiale del 18 settembre 1996: l\'ultimo treno in partenza da Castelvecchio era alle 23:15, mentre l\'ultimo regionale da Firenze Santa Maria Novella partiva alle 21:32 e arrivava a Castelvecchio alle 22:25.'
+      },
+      {
+        id: 'rule_lavori',
+        cardId: 'card4',
+        chipLabel: 'Chi voleva fermare i lavori 2026?',
+        chipMessage: 'Qualcuno nella Fondazione ha cercato di bloccare i lavori di ristrutturazione nel 2026?',
+        keywords: ['lavori', 'lettera', 'sospensione', '2026', 'ministero', 'fermare', 'chi ha chiesto'],
+        reply: 'Un impiegato della Fondazione mi ha passato di nascosto questa lettera riservata del luglio scorso. Guardate chi chiedeva con insistenza di fermare le demolizioni proprio nella Foresteria e nella Cripta:',
+        voiceReply: 'Un impiegato della Fondazione mi ha girato una lettera riservata del 12 luglio 2026: il Prof. Lorenzo Bellini chiedeva con urgenza alla Contessa di bloccare le demolizioni nella Foresteria e nella Cripta, rivolgendosi perfino al Ministero.'
+      },
+      {
+        id: 'rule_affresco',
+        cardId: null,
+        chipLabel: 'L\'affresco è un falso moderno!',
+        chipMessage: 'I test con luce UV e acido cloridrico dimostrano che l\'affresco è dipinto con Blu Ftalo moderno: è un falso!',
+        keywords: ['affresco', 'falso', 'blu ftalo', 'azzurrite', 'pigmento', 'perizia', 'inchiostro verde'],
+        reply: 'Un falso dipinto con Blu Ftalo moderno?! Allora ecco perché la famiglia Valenti ha tenuto chiusa la cappella per trent\'anni incassando i contributi statali! Controllate subito chi ha firmato la perizia di autenticità del giugno 1996 e guardate con che colore di inchiostro ha scritto le note a margine.'
+      },
+      {
+        id: 'rule_contessa',
+        cardId: null,
+        chipLabel: 'Alibi Contessa Beatrice e Moretti',
+        chipMessage: 'Cosa risulta dagli accertamenti sugli alibi della Contessa Beatrice Valenti e dell\'Avv. Moretti?',
+        keywords: ['contessa', 'beatrice', 'roma', 'moretti', 'milano', 'alibi', 'assicurazione'],
+        reply: 'I tabulati Telepass, la ricevuta dell\'Hotel Eden a Roma e le foto del ricevimento a Palazzo Borghese blindano al 100% la presenza della Contessa Beatrice a Roma quella notte (così come Moretti a Milano). Però nell\'ottobre 1996 la Contessa incassò 400 milioni di Lire dall\'assicurazione per il furto del reliquiario: ecco perché oggi vuole insabbiare tutto!'
+      },
+      {
+        id: 'rule_marco',
+        cardId: null,
+        chipLabel: 'Sedile Panda e Marco Rinaldi',
+        chipMessage: 'Il sedile della Panda regolato per 1,85 m punta su Marco Rinaldi: cosa ne pensa?',
+        keywords: ['marco', 'rinaldi', 'panda', 'sedile', '1,85', '1.85', 'muratore', 'calce'],
+        reply: 'Marco Rinaldi è alto 1,85 m ed era innamorato di Eleonora, questo è vero. Però attenzione a un dettaglio tecnico: Marco faceva il muratore di mestiere fin da ragazzo. Non avrebbe mai tirato su una muratura "irregolare e amatoriale" come quella segnalata dai tecnici nel 2026!'
+      },
+      {
+        id: 'rule_agnese',
+        cardId: null,
+        chipLabel: 'Suor Agnese e la tazzina di caffè',
+        chipMessage: 'Vorremmo sapere qualcosa sulle abitudini di Eleonora, la camomilla e la tazzina di caffè sulla scrivania.',
+        keywords: ['agnese', 'suora', 'camomilla', 'caffe', 'zucchero', 'tazzina'],
+        reply: 'Potete chiamare direttamente Suor Agnese al numero della parrocchia: 055-824104. Lei portava spesso la cena a Eleonora la sera e ricorda benissimo che la ragazza soffriva di tachicardia e non toccava mai caffè, solo camomilla!'
+      },
+      {
+        id: 'rule_ferri_valli',
+        cardId: null,
+        chipLabel: 'Chiara Ferri ed Edoardo Valli',
+        chipMessage: 'Cosa sappiamo dei movimenti di Chiara Ferri e dell\'antiquario Edoardo Valli?',
+        keywords: ['ferri', 'chiara', 'valli', 'edoardo', 'biblioteca'],
+        reply: 'Nessuno dei due è uno stinco di santo, ma avevano altri scopi: il gestore dell\'affittacamere ammise che Chiara Ferri rientrò infangata verso mezzanotte solo per rubare gli appunti di restauro di Eleonora, mentre Edoardo Valli (che ha precedenti per traffico d\'arte) frugava nella Biblioteca cercando prove degli anni \'50 per ricattare la Contessa.'
+      }
+    ];
+
+    /* =========================================================================
+       4. STATO APPLICAZIONE & SALVATAGGIO LOCALE
+       ========================================================================= */
+    const STORAGE_KEY = 'solvethiscase_wa_desantis_v1';
+    let state = {
+      messages: [],
+      unlockedCards: [],
+      solved: false
+    };
+
+    function normalizeText(str) {
+      return String(str || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function currentTimeStr() {
+      return new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) state = JSON.parse(saved);
+      } catch (e) {}
+
+      if (!state.messages || state.messages.length === 0) {
+        state.messages = [
+          {
+            id: 'init_1',
+            sender: 'in',
+            text: 'Buonasera ragazzi, sono il Maresciallo Franco De Santis. Avete avuto modo di aprire il fascicolo e guardare le foto della borsa di Eleonora ritrovata nel muro? Quali anomalie avete notato finora?',
+            time: currentTimeStr()
+          }
+        ];
+        saveState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+      updateDossierBadge();
+    }
+
+    function updateDossierBadge() {
+      const count = state.unlockedCards.length;
+      document.getElementById('dossier-count-pill').textContent = `${count}/4`;
+    }
+
+    /* =========================================================================
+       5. RENDERING MESSAGGI & SUGGERIMENTI RAPIDI
+       ========================================================================= */
+    function renderMessages() {
+      const list = document.getElementById('wa-messages-list');
+      list.innerHTML = '';
+
+      // Banner crittografia WhatsApp
+      const sysPill = document.createElement('div');
+      sysPill.className = 'wa-system-pill';
+      sysPill.textContent = '🔒 I messaggi e le chiamate con il Mar. Franco De Santis sono crittografati end-to-end. Fascicolo riservato: Villa Valenti (1996–2026).';
+      list.appendChild(sysPill);
+
+      const dayPill = document.createElement('div');
+      dayPill.className = 'wa-day-pill';
+      dayPill.textContent = 'Oggi';
+      list.appendChild(dayPill);
+
+      state.messages.forEach(msg => {
+        const row = document.createElement('div');
+        row.className = `wa-msg-row ${msg.sender}`;
+
+        const bubble = document.createElement('div');
+        bubble.className = `wa-bubble ${msg.sender}`;
+
+        // Eventuale Allegato Ufficiale PDF-style
+        if (msg.cardId && EVIDENCE_CARDS[msg.cardId]) {
+          const card = EVIDENCE_CARDS[msg.cardId];
+          const evEl = document.createElement('div');
+          evEl.className = 'wa-evidence-card';
+          evEl.onclick = () => openDossierModal(card.id);
+          evEl.innerHTML = `
+            <div class="wa-ev-top">
+              <span class="wa-pdf-badge">ALLEGATO</span>
+              <span class="wa-ev-title">${escapeHtml(card.title)}</span>
+            </div>
+            <div class="wa-ev-body">${escapeHtml(card.body)}</div>
+            <div class="wa-ev-tap-hint">Tocca per aprire nel fascicolo</div>
+          `;
+          bubble.appendChild(evEl);
+        }
+
+        // Testo del messaggio
+        if (msg.text) {
+          const txt = document.createElement('div');
+          txt.className = 'wa-msg-text';
+          txt.textContent = msg.text;
+          bubble.appendChild(txt);
+        }
+
+        // Banner caso risolto
+        if (msg.isSolved) {
+          const banner = document.createElement('div');
+          banner.className = 'wa-solved-banner';
+          banner.innerHTML = `
+            <strong>CASE CLOSED — MANDATO IN PROCURA</strong>
+            Responsabile: <b>Prof. Lorenzo Bellini</b><br/>
+            Occultamento corpo: <b>Loculo Nord della Cripta (Settore C-2)</b>
+          `;
+          bubble.appendChild(banner);
+        }
+
+        // Timestamp + Doppia spunta blu WhatsApp
+        const meta = document.createElement('div');
+        meta.className = 'wa-msg-meta';
+        meta.innerHTML = `
+          <span>${msg.time}</span>
+          ${msg.sender === 'out' ? `<svg width="16" height="11" viewBox="0 0 16 11" fill="#53bdeb"><path d="M11.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-2.405-2.272a.463.463 0 0 0-.336-.146.47.47 0 0 0-.343.146l-.311.31a.445.445 0 0 0-.14.337c0 .136.047.25.14.343l2.996 2.996a.724.724 0 0 0 .501.203.697.697 0 0 0 .546-.266l6.646-8.417a.497.497 0 0 0 .108-.299.441.441 0 0 0-.19-.374l-.337-.273zm4.09 0a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-1.2-1.134-.664.819 1.664 1.664a.724.724 0 0 0 .501.203.697.697 0 0 0 .546-.266l6.646-8.417a.497.497 0 0 0 .108-.299.441.441 0 0 0-.19-.374l-.337-.273z"/></svg>` : ''}
+        `;
+        bubble.appendChild(meta);
+
+        row.appendChild(bubble);
+        list.appendChild(row);
+      });
+
+      scrollChatToBottom();
+      renderQuickChips();
+    }
+
+    function scrollChatToBottom() {
+      const list = document.getElementById('wa-messages-list');
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function renderQuickChips() {
+      const strip = document.getElementById('wa-quick-chips');
+      strip.innerHTML = '';
+
+      // Mostra solo suggerimenti non ancora usati
+      const usedSet = new Set(state.messages.map(m => m.ruleId).filter(Boolean));
+      const available = KNOWLEDGE_RULES.filter(r => !usedSet.has(r.id));
+
+      available.slice(0, 4).forEach(rule => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'wa-chip';
+        btn.textContent = rule.chipLabel;
+        btn.onclick = () => {
+          document.getElementById('wa-message-input').value = rule.chipMessage;
+          handleUserMessageSubmit(new Event('submit'));
+        };
+        strip.appendChild(btn);
+      });
+
+      if (state.unlockedCards.length >= 3 && !state.solved) {
+        const finalBtn = document.createElement('button');
+        finalBtn.type = 'button';
+        finalBtn.className = 'wa-chip accuse';
+        finalBtn.textContent = 'Formula accusa finale';
+        finalBtn.onclick = () => {
+          const inp = document.getElementById('wa-message-input');
+          inp.value = 'Maresciallo, abbiamo ricostruito tutto: il colpevole è Lorenzo Bellini e il corpo di Eleonora è murato nel Loculo Nord della Cripta (Settore C-2)!';
+          inp.focus();
+        };
+        strip.appendChild(finalBtn);
+      }
+    }
+
+    /* =========================================================================
+       6. MOTORE RISPOSTE DEL MARESCIALLO
+       ========================================================================= */
+    function handleUserMessageSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('wa-message-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      state.messages.push({
+        id: 'u_' + Date.now(),
+        sender: 'out',
+        text: text,
+        time: currentTimeStr()
+      });
+      saveState();
+      renderMessages();
+
+      setTypingStatus(true);
+
+      setTimeout(() => {
+        processMarshalResponse(text);
+      }, 1200);
+    }
+
+    function processMarshalResponse(rawText) {
+      const norm = normalizeText(rawText);
+      const t = currentTimeStr();
+
+      const mentionsBellini = norm.includes('bellini') || norm.includes('lorenzo');
+      const mentionsLocation = norm.includes('cripta') || norm.includes('loculo') || norm.includes('c-2') || norm.includes('c2');
+
+      // 10. Accusa finale completa (Bellini + Cripta/Loculo/C-2)
+      if (mentionsBellini && mentionsLocation) {
+        state.solved = true;
+        state.messages.push({
+          id: 'solved_' + Date.now(),
+          sender: 'in',
+          text: 'Ragazzi... ho la pelle d\'oca. Avete incastrato ogni singolo pezzo: il falso d\'arte anni \'50, la perizia firmata in inchiostro verde, la bustina di zucchero di Firenze sulla scrivania, il treno delle 21:32 e la muratura amatoriale nel Loculo Nord della Cripta. Sto andando subito dal Procuratore della Repubblica per far sequestrare la Cripta e aprire quel loculo. Dopo trent\'anni Eleonora avrà giustizia!',
+          isSolved: true,
+          time: t
+        });
+        finishReply();
+        return;
+      }
+
+      // Accusa parziale (solo Bellini o solo Cripta)
+      if (mentionsBellini && !mentionsLocation) {
+        state.messages.push({
+          id: 'half_b_' + Date.now(),
+          sender: 'in',
+          text: 'Tutto porta diritto al Prof. Lorenzo Bellini, avete ragione! Ma ricordate: senza indicare il punto esatto della villa in cui ha nascosto il corpo di Eleonora, il Procuratore non firmerà mai il mandato di scavo. Guardate bene la planimetria 2026 e le note tecniche sui settori!',
+          time: t
+        });
+        finishReply();
+        return;
+      }
+
+      if (mentionsLocation && !mentionsBellini) {
+        state.messages.push({
+          id: 'half_c_' + Date.now(),
+          sender: 'in',
+          text: 'Esatto, il Loculo Nord della Cripta (Settore C-2) con quella muratura irregolare e amatoriale! Adesso però dovete dirmi con certezza chi era con Eleonora quella notte e l\'ha murata lì dentro.',
+          time: t
+        });
+        finishReply();
+        return;
+      }
+
+      // Ricerca nelle regole 1..9
+      let matchedRule = null;
+      const usedSet = new Set(state.messages.map(m => m.ruleId).filter(Boolean));
+
+      for (const rule of KNOWLEDGE_RULES) {
+        if (rule.keywords.some(kw => norm.includes(normalizeText(kw)))) {
+          if (!usedSet.has(rule.id)) {
+            matchedRule = rule;
+            break;
+          } else if (!matchedRule) {
+            matchedRule = rule;
+          }
+        }
+      }
+
+      if (matchedRule) {
+        if (matchedRule.cardId && !state.unlockedCards.includes(matchedRule.cardId)) {
+          state.unlockedCards.push(matchedRule.cardId);
+        }
+        state.messages.push({
+          id: 'in_' + Date.now(),
+          sender: 'in',
+          ruleId: matchedRule.id,
+          cardId: matchedRule.cardId,
+          text: matchedRule.reply,
+          time: t
+        });
+      } else {
+        const fallbacks = [
+          'Capisco il vostro ragionamento, ragazzi, ma al Procuratore servono riscontri oggettivi. Chiedetemi una verifica mirata sugli espatri del 1996, sulla strada consortile e la sbarra, sugli orari dei treni FS o su chi ha chiesto di fermare i lavori nel 2026.',
+          'Tenete d\'occhio i dettagli piccoli: il contenuto della borsa di Eleonora, i tempi di percorrenza sulla mappa, i pigmenti dell\'affresco e le abitudini di Eleonora. Su quale elemento volete che faccia un controllo?',
+          'Ditemi quale nome, orario o documento volete che controlli nei miei vecchi fascicoli dei Carabinieri.'
+        ];
+        state.messages.push({
+          id: 'fb_' + Date.now(),
+          sender: 'in',
+          text: fallbacks[state.messages.length % fallbacks.length],
+          time: t
+        });
+      }
+
+      finishReply();
+    }
+
+    function finishReply() {
+      setTypingStatus(false);
+      audioEngine.playIncomingPop();
+      saveState();
+      renderMessages();
+    }
+
+    function setTypingStatus(isTyping) {
+      const el = document.getElementById('wa-status-text');
+      el.textContent = isTyping ? 'sta scrivendo...' : 'online';
+      el.classList.toggle('typing', isTyping);
+    }
+
+    /* =========================================================================
+       7. CHIAMATA VOCALE WHATSAPP (SOLO DALLA CORNETTA IN ALTO)
+       ========================================================================= */
+    let callTimerHandle = null;
+    let callSeconds = 0;
+    let isMuted = false;
+
+    function openWhatsAppCall() {
+      closeWhatsAppCall(true);
+      const overlay = document.getElementById('wa-call-overlay');
+      const timerEl = document.getElementById('wa-call-timer');
+      const avatarEl = document.getElementById('wa-call-avatar');
+      const subEl = document.getElementById('wa-call-subtitle');
+      const qList = document.getElementById('wa-call-questions');
+
+      timerEl.textContent = 'Sta squillando...';
+      timerEl.classList.remove('connected');
+      avatarEl.classList.add('ringing');
+      subEl.textContent = 'Inoltro chiamata sul cellulare personale del Maresciallo...';
+      qList.classList.add('hidden');
+      overlay.classList.add('open');
+
+      audioEngine.startRinging();
+
+      setTimeout(() => {
+        if (!overlay.classList.contains('open')) return;
+        audioEngine.stopRinging();
+        avatarEl.classList.remove('ringing');
+        timerEl.classList.add('connected');
+        qList.classList.remove('hidden');
+
+        callSeconds = 0;
+        timerEl.textContent = '00:00';
+        callTimerHandle = setInterval(() => {
+          callSeconds++;
+          const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+          const s = String(callSeconds % 60).padStart(2, '0');
+          timerEl.textContent = `${m}:${s}`;
+        }, 1000);
+
+        const greeting = 'Pronto ragazzi, sono il Maresciallo De Santis. Vi sento forte e chiaro: ditemi pure su quale punto volete un controllo immediato.';
+        subEl.textContent = greeting;
+        audioEngine.speak(greeting);
+      }, 2200);
+    }
+
+    function askVoiceQuestion(topicKey) {
+      const map = {
+        fuga: 'rule_fuga',
+        strada: 'rule_strada',
+        treni: 'rule_treni',
+        lavori: 'rule_lavori'
+      };
+      const rule = KNOWLEDGE_RULES.find(r => r.id === map[topicKey]);
+      if (!rule) return;
+
+      const spoken = rule.voiceReply || rule.reply;
+      document.getElementById('wa-call-subtitle').textContent = spoken;
+      audioEngine.speak(spoken);
+
+      // Sblocca il relativo documento anche nella chat e nel fascicolo
+      if (rule.cardId && !state.unlockedCards.includes(rule.cardId)) {
+        state.unlockedCards.push(rule.cardId);
+        state.messages.push({
+          id: 'call_doc_' + Date.now(),
+          sender: 'in',
+          ruleId: rule.id,
+          cardId: rule.cardId,
+          text: `[Allegato inviato durante la chiamata] ${rule.reply}`,
+          time: currentTimeStr()
+        });
+        saveState();
+        renderMessages();
+      }
+    }
+
+    function toggleCallSpeaker() {
+      audioEngine.speakerEnabled = !audioEngine.speakerEnabled;
+      document.getElementById('call-speaker-btn').classList.toggle('active-state', audioEngine.speakerEnabled);
+      if (!audioEngine.speakerEnabled) audioEngine.stopSpeech();
+    }
+
+    function toggleCallMute() {
+      isMuted = !isMuted;
+      document.getElementById('call-mute-btn').classList.toggle('active-state', isMuted);
+    }
+
+    function closeWhatsAppCall(silent = false) {
+      audioEngine.stopRinging();
+      audioEngine.stopSpeech();
+      if (callTimerHandle) {
+        clearInterval(callTimerHandle);
+        callTimerHandle = null;
+      }
+      if (!silent) {
+        document.getElementById('wa-call-overlay').classList.remove('open');
+      }
+    }
+
+    /* =========================================================================
+       8. MENU TRE PUNTINI, FASCICOLO DOCUMENTI E RESET
+       ========================================================================= */
+    function toggleDropdownMenu() {
+      document.getElementById('wa-menu-dropdown').classList.toggle('hidden');
+    }
+
+    // Chiudi menu se si tocca altrove
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('wa-menu-dropdown');
+      if (!menu.classList.contains('hidden') && !e.target.closest('.wa-right-actions')) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function openDossierModal(focusCardId = null) {
+      const container = document.getElementById('wa-dossier-list');
+      if (state.unlockedCards.length === 0) {
+        container.innerHTML = '<p style="font-size: 13.5px; color: #8696a0; text-align: center; padding: 20px 8px;">Nessun documento ufficiale ancora sbloccato. Scrivi al Maresciallo in chat o chiamalo dalla cornetta in alto per ottenere i riscontri d\'archivio.</p>';
+      } else {
+        const idsToShow = focusCardId ? [focusCardId] : state.unlockedCards;
+        container.innerHTML = idsToShow.map(id => {
+          const c = EVIDENCE_CARDS[id];
+          if (!c) return '';
+          return `
+            <div class="dossier-card">
+              <div class="dossier-card-title">${escapeHtml(c.title)}</div>
+              <div class="dossier-card-text">${escapeHtml(c.body)}</div>
+            </div>
+          `;
+        }).join('');
+      }
+      document.getElementById('wa-dossier-modal').classList.add('open');
+    }
+
+    function closeDossierModal() {
+      document.getElementById('wa-dossier-modal').classList.remove('open');
+    }
+
+    function openResetModal() {
+      document.getElementById('wa-reset-modal').classList.add('open');
+    }
+
+    function closeResetModal() {
+      document.getElementById('wa-reset-modal').classList.remove('open');
+    }
+
+    function confirmResetChat() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = { messages: [], unlockedCards: [], solved: false };
+      closeResetModal();
+      loadState();
+      renderMessages();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderMessages();
+    });
+  </script>
+</body>
+</html>
